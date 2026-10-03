@@ -1,0 +1,33 @@
+name: DigiPico CI / Copilot Automation
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Lint and Build
+      run: |
+        npm run lint
+        npm run build
+        
+    # Example of Copilot PR Review Automation hook
+    # - name: Copilot Code Review
+    #   uses: github/copilot-action-review@v1
+    #   with:
+    #     github-token: ${{ secrets.GITHUB_TOKEN }}

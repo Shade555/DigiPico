@@ -28,21 +28,21 @@
 
 ## Partner Integrations
 
-- [ ] Render
+- [x] Render
 - [x] TabPFN
 - [x] Tinker
-- [ ] DigitalOcean
-- [ ] Gemma
+- [x] DigitalOcean
+- [x] Gemma
 - [x] Backboard
 - [x] ElevenLabs
-- [ ] Entire
-- [ ] GitHub Copilot
+- [x] Entire
+- [x] GitHub Copilot
 - [x] Mastra
 - [x] MongoDB Atlas
-- [ ] Sentry
+- [x] Sentry
 - [x] SerpApi
 - [x] Temporal
-- [ ] Tiger Data
+- [x] Tiger Data
 
 ## Features
 
@@ -70,9 +70,9 @@
 
 - [ ] Hacktoberfest demo
 - [ ] Partner evidence
-- [ ] DEV article
-- [ ] Gemma 4 submission
-- [ ] Kaggle documentation
+- [x] DEV article
+- [x] Gemma 4 submission
+- [x] Kaggle documentation
 
 ---
 
