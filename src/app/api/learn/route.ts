@@ -11,18 +11,15 @@ export async function POST(req: Request) {
       throw new Error("Missing GOOGLE_API_KEY");
     }
 
-    const prompt = `You are a computer science professor. Create a 5-step learning curriculum for a complete beginner learning about: "${topic}". 
-    You must reply ONLY with a raw JSON object (no markdown, no markdown blocks, no code fences).
+    const prompt = `You are a senior computer science professor. Create an incredibly comprehensive 8-step learning curriculum for a beginner learning about: "${topic}". 
+    You must reply ONLY with a raw JSON object (no markdown).
     The JSON must match this exact structure:
     {
       "topic": "${topic}",
       "progress": 0,
       "steps": [
-        { "id": 1, "title": "Step Name", "description": "1 sentence description.", "type": "concept", "status": "current" },
-        { "id": 2, "title": "Step Name", "description": "1 sentence description.", "type": "concept", "status": "locked" },
-        { "id": 3, "title": "Step Name", "description": "1 sentence description.", "type": "project", "status": "locked" },
-        { "id": 4, "title": "Step Name", "description": "1 sentence description.", "type": "quiz", "status": "locked" },
-        { "id": 5, "title": "Step Name", "description": "1 sentence description.", "type": "concept", "status": "locked" }
+        { "id": 1, "title": "Step 1", "description": "2-3 sentences of detailed description.", "type": "concept", "status": "current" },
+        ... generate 8 total detailed steps here (use types: 'concept', 'project', 'quiz', 'deep-dive'). The rest should have status "locked".
       ]
     }`;
 

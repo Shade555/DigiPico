@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PicoMascot } from "@/components/features/pico/PicoMascot";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Loader2, Volume2, VolumeX } from "lucide-react";
+import { Send, Loader2, Volume2, VolumeX, History, Trash2, ArrowLeft } from "lucide-react";
 import { textToSpeech } from "@/lib/audio";
 
 export function ChatInterface() {
@@ -13,6 +13,10 @@ export function ChatInterface() {
   const [threadId, setThreadId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [autoSendMsg, setAutoSendMsg] = useState<string | null>(null);
+  
+  const [allThreads, setAllThreads] = useState<{ threadId: string, preview: string, messages: Record<string, unknown>[], date: string }[]>([]);
+  const [showThreads, setShowThreads] = useState(false);
   
   useEffect(() => {
     const userId = localStorage.getItem("digipico_user_id");
@@ -25,32 +29,36 @@ export function ChatInterface() {
       if (history) {
         try {
           setTimeout(() => setMessages(JSON.parse(history)), 0);
-          if (savedThreadId) setThreadId(savedThreadId);
+          if (savedThreadId) setTimeout(() => setThreadId(savedThreadId), 0);
         } catch (e) {
           console.error("Could not parse chat history", e);
         }
       }
-      setTimeout(() => setIsCheckingAuth(false), 0);
+      
+      const savedThreads = localStorage.getItem("digipico_chat_threads");
+      if (savedThreads) {
+        try {
+          setTimeout(() => setAllThreads(JSON.parse(savedThreads)), 0);
+        } catch(e) {}
+      }
+      setTimeout(() => {
+        setIsCheckingAuth(false);
+        const autoMsg = localStorage.getItem("digipico_start_lesson");
+        if (autoMsg) {
+          localStorage.removeItem("digipico_start_lesson");
+          setAutoSendMsg(autoMsg);
+        }
+      }, 100); // Slight delay to let history hydrate
     }
   }, []);
 
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem("digipico_chat_history", JSON.stringify(messages));
-    }
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, isLoading]);
-
-  if (isCheckingAuth) return <div className="h-screen bg-[#080b1a]" />; // Prevent UI flash before redirect
-
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (overrideInput?: string) => {
+    const textToSend = overrideInput || input;
+    if (!textToSend.trim() || isLoading) return;
     
-    const newMessages = [...messages, { role: "user", content: input }];
+    const newMessages = [...messages, { role: "user", content: textToSend }];
     setMessages(newMessages);
-    setInput("");
+    if (!overrideInput) setInput("");
     setIsLoading(true);
 
     try {
@@ -67,7 +75,25 @@ export function ChatInterface() {
       }
       
       if (data.content) {
-        setMessages([...newMessages, { role: "assistant", content: data.content }]);
+        const fullMessages = [...newMessages, { role: "assistant", content: data.content }];
+        setMessages(fullMessages);
+        
+        if (data.threadId) {
+          setAllThreads(prev => {
+            const updated = [...prev];
+            const idx = updated.findIndex(t => t.threadId === data.threadId);
+            const tData = {
+              threadId: data.threadId,
+              preview: textToSend.substring(0, 40) + "...",
+              messages: fullMessages,
+              date: new Date().toISOString()
+            };
+            if (idx >= 0) updated[idx] = tData;
+            else updated.push(tData);
+            localStorage.setItem("digipico_chat_threads", JSON.stringify(updated));
+            return updated;
+          });
+        }
         
         try {
           const audioBuffer = await textToSpeech(data.content);
@@ -88,31 +114,108 @@ export function ChatInterface() {
     }
   };
 
+  useEffect(() => {
+    if (autoSendMsg && !isLoading && !isCheckingAuth) {
+      setTimeout(() => handleSend(autoSendMsg), 0);
+      setTimeout(() => setAutoSendMsg(null), 0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSendMsg, isCheckingAuth]);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem("digipico_chat_history", JSON.stringify(messages));
+    }
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isLoading]);
+
+  if (isCheckingAuth) return <div className="h-screen bg-[#080b1a]" />; // Prevent UI flash before redirect
+
+
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] bg-[#080b1a] rounded-t-3xl overflow-hidden relative">
-      <div className="bg-[#0a0f24] p-4 border-b border-[#1e2753] flex items-center justify-between">
+      <div className="bg-[#0a0f24] p-4 border-b border-[#1e2753] flex items-center justify-between z-20 relative shadow-sm">
         <div className="flex items-center gap-3">
           <PicoMascot size="sm" mood={isLoading ? "thinking" : "happy"} />
           <h2 className="font-bold text-slate-100 tracking-tight text-lg">Pico Tutor</h2>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="text-slate-500 hover:text-red-400 hover:bg-red-900/20"
-          onClick={() => {
-            if (confirm("Clear this conversation?")) {
-              localStorage.removeItem("digipico_chat_history");
-              localStorage.removeItem("digipico_thread_id");
-              setMessages([]);
-              setThreadId(null);
-            }
-          }}
-        >
-          Clear
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`text-slate-500 hover:text-blue-400 hover:bg-blue-900/20 ${showThreads ? 'text-blue-400 bg-blue-900/20' : ''}`}
+            onClick={() => setShowThreads(!showThreads)}
+          >
+            <History className="w-4 h-4 mr-1" />
+            History
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-slate-500 hover:text-red-400 hover:bg-red-900/20"
+            onClick={() => {
+              if (confirm("Start a new conversation?")) {
+                localStorage.removeItem("digipico_chat_history");
+                localStorage.removeItem("digipico_thread_id");
+                setMessages([]);
+                setThreadId(null);
+                setShowThreads(false);
+              }
+            }}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
+      <div className="flex-1 overflow-hidden relative">
+        <AnimatePresence>
+          {showThreads && (
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="absolute inset-0 bg-[#080b1a] z-10 p-4 overflow-y-auto"
+            >
+              <h3 className="font-bold text-slate-200 mb-4 flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="p-0 h-6 w-6 rounded-full" onClick={() => setShowThreads(false)}>
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+                Previous Chats
+              </h3>
+              {allThreads.length === 0 ? (
+                <p className="text-slate-500 text-sm text-center mt-10">No chat history yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {allThreads.slice().reverse().map(t => (
+                    <div 
+                      key={t.threadId}
+                      onClick={() => {
+                        setThreadId(t.threadId);
+                        setMessages(t.messages);
+                        localStorage.setItem("digipico_thread_id", t.threadId);
+                        localStorage.setItem("digipico_chat_history", JSON.stringify(t.messages));
+                        setShowThreads(false);
+                      }}
+                      className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                        threadId === t.threadId 
+                          ? 'bg-blue-600/10 border-blue-500/50 text-blue-200' 
+                          : 'bg-[#131b3b] border-[#1e2753] hover:border-slate-500 text-slate-300'
+                      }`}
+                    >
+                      <p className="text-sm font-medium truncate">{t.preview}</p>
+                      <p className="text-[10px] text-slate-500 mt-1">{new Date(t.date).toLocaleDateString()} {new Date(t.date).toLocaleTimeString()}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div ref={scrollRef} className="h-full overflow-y-auto p-4 space-y-4 scroll-smooth">
         <AnimatePresence>
           {messages.length === 0 && (
             <motion.div 
@@ -154,6 +257,7 @@ export function ChatInterface() {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
       </div>
 
       <div className="p-4 bg-[#0a0f24] border-t border-[#1e2753]">

@@ -176,27 +176,41 @@ export default function LearnPage() {
               )}
               
               {step.status === 'current' && (
-                <Button 
-                  onClick={() => {
-                    const newSteps = [...learningPath.steps];
-                    const currentIndex = newSteps.findIndex(s => s.id === step.id);
-                    if (currentIndex !== -1) {
-                      newSteps[currentIndex].status = 'completed';
-                      if (currentIndex + 1 < newSteps.length) {
-                        newSteps[currentIndex + 1].status = 'current';
+                <div className="flex gap-2 mt-4">
+                  <Button 
+                    onClick={() => {
+                      localStorage.setItem("digipico_start_lesson", `Hi Pico! I am ready to start learning about "${step.title}" for ${learningPath.topic}. Can you act as my tutor and explain it to me simply?`);
+                      window.location.href = "/";
+                    }}
+                    size="sm" 
+                    className="flex-1 rounded-xl bg-white text-black hover:bg-slate-200 font-bold transition-transform active:scale-95 shadow-md"
+                  >
+                    Learn with Pico <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                  
+                  <Button 
+                    onClick={() => {
+                      const newSteps = [...learningPath.steps];
+                      const currentIndex = newSteps.findIndex(s => s.id === step.id);
+                      if (currentIndex !== -1) {
+                        newSteps[currentIndex].status = 'completed';
+                        if (currentIndex + 1 < newSteps.length) {
+                          newSteps[currentIndex + 1].status = 'current';
+                        }
+                        setLearningPath({
+                          ...learningPath,
+                          steps: newSteps,
+                          progress: Math.min(100, Math.round(((currentIndex + 1) / newSteps.length) * 100))
+                        });
                       }
-                      setLearningPath({
-                        ...learningPath,
-                        steps: newSteps,
-                        progress: Math.min(100, Math.round(((currentIndex + 1) / newSteps.length) * 100))
-                      });
-                    }
-                  }}
-                  size="sm" 
-                  className="w-full mt-4 rounded-xl bg-white text-black hover:bg-slate-200 font-bold transition-transform active:scale-95 shadow-md"
-                >
-                  Start Lesson <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
+                    }}
+                    size="sm" 
+                    variant="outline"
+                    className="rounded-xl border-[#1e2753] bg-[#0a0f24] hover:bg-[#131b3b] text-slate-300 font-bold transition-transform active:scale-95 shadow-md"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                  </Button>
+                </div>
               )}
             </div>
           </motion.div>
