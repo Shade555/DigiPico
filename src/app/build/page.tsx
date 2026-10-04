@@ -30,7 +30,9 @@ export default function BuildPage() {
       if (Array.isArray(parsed) && parsed.length > 0) {
         storedTopics = parsed;
       }
-    } catch (e) {}
+    } catch {
+      // Ignored
+    }
     
     if (storedTopics.length === 0) {
       const legacy = localStorage.getItem("digipico_interest") || "Artificial Intelligence";

@@ -21,6 +21,47 @@ interface LearningPath {
   error?: string;
 }
 
+const CUTE_LOADING_MESSAGES = [
+  "Pico is reading some books...",
+  "Putting on the thinking cap...",
+  "Gathering the best tutorials...",
+  "Writing down the curriculum...",
+  "Almost ready! Hang tight..."
+];
+
+function LoadingIndicator() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % CUTE_LOADING_MESSAGES.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="bg-[#131b3b] rounded-2xl px-5 py-3 border border-[#1e2753] flex items-center gap-3 shadow-md overflow-hidden relative min-w-[250px]">
+        <Loader2 className="w-5 h-5 animate-spin text-blue-400 flex-shrink-0" />
+        <AnimatePresence mode="wait">
+          <motion.span 
+            key={index}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.2 }}
+            className="text-sm font-medium text-slate-300 whitespace-nowrap"
+          >
+            {CUTE_LOADING_MESSAGES[index]}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/mascot.png" alt="Pico" className="w-20 h-20 opacity-80 animate-bounce mt-4" />
+    </div>
+  );
+}
+
 export default function LearnPage() {
   const router = useRouter();
   const [learningPath, setLearningPath] = useState<LearningPath | null>(null);
@@ -36,7 +77,9 @@ export default function LearnPage() {
       if (Array.isArray(parsed) && parsed.length > 0) {
         storedTopics = parsed;
       }
-    } catch (e) {}
+    } catch {
+      // Ignored
+    }
     
     if (storedTopics.length === 0) {
       const legacy = localStorage.getItem("digipico_interest") || "Introduction to AI";
@@ -74,45 +117,7 @@ export default function LearnPage() {
     fetchPath();
   }, [selectedTopic]);
 
-const CUTE_LOADING_MESSAGES = [
-  "Pico is reading some books...",
-  "Putting on the thinking cap...",
-  "Gathering the best tutorials...",
-  "Writing down the curriculum...",
-  "Almost ready! Hang tight..."
-];
 
-function LoadingIndicator() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % CUTE_LOADING_MESSAGES.length);
-    }, 2500);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="bg-[#131b3b] rounded-2xl px-5 py-3 border border-[#1e2753] flex items-center gap-3 shadow-md overflow-hidden relative min-w-[250px]">
-        <Loader2 className="w-5 h-5 animate-spin text-blue-400 flex-shrink-0" />
-        <AnimatePresence mode="wait">
-          <motion.span 
-            key={index}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.2 }}
-            className="text-sm font-medium text-slate-300 whitespace-nowrap"
-          >
-            {CUTE_LOADING_MESSAGES[index]}
-          </motion.span>
-        </AnimatePresence>
-      </div>
-      <img src="/mascot.png" alt="Pico" className="w-20 h-20 opacity-80 animate-bounce mt-4" />
-    </div>
-  );
-}
 
   if (isLoading || !learningPath) {
     return (

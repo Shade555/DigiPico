@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 export function CodeSandbox({ defaultCode = "console.log('Hello World!');", onComplete }: { defaultCode?: string, onComplete?: () => void }) {
   const [code, setCode] = useState(defaultCode);
   const [output, setOutput] = useState<string[]>([]);
-  const [isSuccess, setIsSuccess] = useState(false);
+
 
   const runCode = () => {
     setOutput([]);
@@ -37,7 +37,6 @@ export function CodeSandbox({ defaultCode = "console.log('Hello World!');", onCo
     setOutput(logs);
 
     if (!hasError) {
-      setIsSuccess(true);
       if (onComplete) onComplete();
     }
   };
