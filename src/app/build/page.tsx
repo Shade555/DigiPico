@@ -1,40 +1,56 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, CheckCircle2, ChevronRight, Terminal } from "lucide-react";
+import { Play, CheckCircle2, ChevronRight, Terminal, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function BuildPage() {
-  const challenges = [
-    {
-      id: 1,
-      title: "Make an API Request",
-      description: "Ask a public server for a random joke using JavaScript.",
-      difficulty: "Beginner",
-      completed: true,
-    },
-    {
-      id: 2,
-      title: "Talk to Gemini",
-      description: "Send a simple prompt to a language model and print the reply.",
-      difficulty: "Beginner",
-      completed: false,
-      active: true,
-    },
-    {
-      id: 3,
-      title: "Build a Weather App",
-      description: "Connect to a weather API and display the temperature.",
-      difficulty: "Intermediate",
-      completed: false,
+  const [challenges, setChallenges] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [codeOutputs, setCodeOutputs] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+    async function fetchChallenges() {
+      try {
+        const res = await fetch("/api/build");
+        const data = await res.json();
+        setChallenges(data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  ];
+    fetchChallenges();
+  }, []);
+
+  const runCode = async (id: number, template: string) => {
+    setCodeOutputs(prev => ({ ...prev, [id]: "Running..." }));
+    try {
+      // Very simple sandbox execution using async function
+      const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+      const fn = new AsyncFunction(template);
+      const result = await fn();
+      setCodeOutputs(prev => ({ ...prev, [id]: String(result) }));
+    } catch (e: any) {
+      setCodeOutputs(prev => ({ ...prev, [id]: `Error: ${e.message}` }));
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#080b1a]">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
 
   return (
-    <main className="p-6 max-w-md mx-auto space-y-6 pb-24">
+    <main className="p-6 max-w-md mx-auto space-y-6 pb-24 bg-[#080b1a] min-h-screen text-slate-100">
       <header className="pt-4 pb-2">
-        <h1 className="text-3xl font-black tracking-tight text-zinc-900">Hands-on</h1>
-        <p className="text-zinc-500 font-medium mt-1">Learn by doing. Complete tiny challenges.</p>
+        <h1 className="text-3xl font-black tracking-tight text-slate-100">Hands-on</h1>
+        <p className="text-slate-400 font-medium mt-1">Learn by doing. Complete tiny challenges.</p>
       </header>
 
       <div className="space-y-4">
@@ -46,46 +62,52 @@ export default function BuildPage() {
             key={challenge.id}
             className={`relative p-5 rounded-3xl border-2 transition-all ${
               challenge.completed 
-                ? "bg-green-50 border-green-200" 
+                ? "bg-green-900/20 border-green-800/50" 
                 : challenge.active 
-                  ? "bg-white border-blue-500 shadow-md scale-[1.02]" 
-                  : "bg-white border-zinc-100 opacity-60"
+                  ? "bg-[#0a0f24] border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)] scale-[1.02]" 
+                  : "bg-[#0a0f24] border-[#1e2753] opacity-60"
             }`}
           >
             <div className="flex justify-between items-start mb-2">
-              <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
-                challenge.completed ? "bg-green-200 text-green-800" : challenge.active ? "bg-blue-100 text-blue-700" : "bg-zinc-100 text-zinc-500"
+              <span className={`text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider ${
+                challenge.completed ? "bg-green-900/40 text-green-400 border border-green-800/50" : challenge.active ? "bg-blue-900/40 text-blue-400 border border-blue-800/50" : "bg-[#131b3b] text-slate-400 border border-[#1e2753]"
               }`}>
                 {challenge.difficulty}
               </span>
-              {challenge.completed && <CheckCircle2 className="w-5 h-5 text-green-600" />}
+              {challenge.completed && <CheckCircle2 className="w-5 h-5 text-green-500" />}
             </div>
             
-            <h3 className="font-bold text-lg text-zinc-900 leading-tight mb-1">{challenge.title}</h3>
-            <p className="text-sm text-zinc-600 mb-4 leading-relaxed">{challenge.description}</p>
+            <h3 className="font-bold text-lg text-slate-100 leading-tight mb-1">{challenge.title}</h3>
+            <p className="text-sm text-slate-400 mb-4 leading-relaxed">{challenge.description}</p>
 
             {challenge.active && (
-              <div className="bg-zinc-900 rounded-2xl p-4 overflow-hidden relative group">
-                <div className="flex items-center gap-2 mb-3 border-b border-zinc-700 pb-2">
-                  <Terminal className="w-4 h-4 text-zinc-400" />
-                  <span className="text-xs text-zinc-400 font-mono">script.js</span>
+              <div className="bg-[#050711] rounded-2xl p-4 overflow-hidden relative border border-[#1e2753]">
+                <div className="flex items-center gap-2 mb-3 border-b border-[#1e2753] pb-2">
+                  <Terminal className="w-4 h-4 text-slate-500" />
+                  <span className="text-xs text-slate-500 font-mono">script.js</span>
                 </div>
-                <pre className="text-xs font-mono text-green-400 leading-relaxed overflow-x-auto">
-                  <code>
-                    <span className="text-purple-400">const</span> response = <span className="text-purple-400">await</span> fetch(<span className="text-yellow-300">"/api/chat"</span>);{'\n'}
-                    <span className="text-purple-400">const</span> data = <span className="text-purple-400">await</span> response.json();{'\n'}
-                    console.log(data);
-                  </code>
+                <pre className="text-xs font-mono text-green-400 leading-relaxed overflow-x-auto whitespace-pre-wrap">
+                  <code>{challenge.template}</code>
                 </pre>
                 
-                <Button className="w-full mt-4 bg-white text-black hover:bg-zinc-200 rounded-xl font-bold transition-transform active:scale-95">
+                {codeOutputs[challenge.id] && (
+                  <div className="mt-3 p-3 bg-[#131b3b] rounded-xl border border-[#1e2753]">
+                    <span className="text-[10px] text-slate-500 uppercase font-bold block mb-1">Output</span>
+                    <span className="text-sm font-mono text-blue-400">{codeOutputs[challenge.id]}</span>
+                  </div>
+                )}
+                
+                <Button 
+                  onClick={() => runCode(challenge.id, challenge.template)}
+                  className="w-full mt-4 bg-blue-600 text-white hover:bg-blue-500 rounded-xl font-bold transition-transform active:scale-95"
+                >
                   <Play className="w-4 h-4 mr-2" /> Run Code
                 </Button>
               </div>
             )}
             
             {!challenge.active && !challenge.completed && (
-              <Button variant="ghost" className="w-full mt-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-xl">
+              <Button variant="ghost" className="w-full mt-2 text-slate-500 hover:text-slate-300 hover:bg-[#131b3b] rounded-xl">
                 Start Challenge <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             )}

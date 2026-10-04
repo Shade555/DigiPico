@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-zinc-50 min-h-screen pb-16`}>
+      <body className={`${inter.className} bg-[#080b1a] text-slate-100 min-h-screen pb-16`}>
         {children}
         <MobileNav />
       </body>

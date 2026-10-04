@@ -15,7 +15,7 @@ export function MobileNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-zinc-200 safe-area-bottom">
+    <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-[#0a0f24] border-t border-[#1e2753] safe-area-bottom">
       <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -24,8 +24,8 @@ export function MobileNav() {
             <Link
               key={item.name}
               href={item.href}
-              className={`inline-flex flex-col items-center justify-center px-5 hover:bg-zinc-50 ${
-                isActive ? "text-blue-600" : "text-zinc-500"
+              className={`inline-flex flex-col items-center justify-center px-5 hover:bg-[#131b3b] transition-colors ${
+                isActive ? "text-blue-400" : "text-slate-400"
               }`}
             >
               <Icon className="w-6 h-6 mb-1" />

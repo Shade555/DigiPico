@@ -61,10 +61,10 @@ export function ChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-3xl shadow-lg border border-blue-100 overflow-hidden relative">
-      <div className="bg-blue-50/50 p-4 border-b flex items-center justify-center gap-3">
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-[#080b1a] rounded-t-3xl overflow-hidden relative">
+      <div className="bg-[#0a0f24] p-4 border-b border-[#1e2753] flex items-center justify-center gap-3">
         <PicoMascot size="sm" mood={isLoading ? "thinking" : "happy"} />
-        <h2 className="font-bold text-blue-900 tracking-tight text-lg">Pico Tutor</h2>
+        <h2 className="font-bold text-slate-100 tracking-tight text-lg">Pico Tutor</h2>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
@@ -73,7 +73,7 @@ export function ChatInterface() {
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center h-full text-center text-zinc-500 mt-10 space-y-4"
+              className="flex flex-col items-center justify-center h-full text-center text-slate-400 mt-10 space-y-4"
             >
               <PicoMascot size="lg" mood="curious" />
               <p className="max-w-[200px] text-sm">Hi! I'm Pico. Ask me anything about technology, and I'll explain it simply!</p>
@@ -87,7 +87,7 @@ export function ChatInterface() {
               key={i} 
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`rounded-2xl px-5 py-3 max-w-[85%] text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-zinc-100 text-zinc-800 rounded-bl-sm border border-zinc-200'}`}>
+              <div className={`rounded-2xl px-5 py-3 max-w-[85%] text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-[#131b3b] text-slate-200 rounded-bl-sm border border-[#1e2753]'}`}>
                 {msg.content}
               </div>
             </motion.div>
@@ -99,21 +99,21 @@ export function ChatInterface() {
               animate={{ opacity: 1 }} 
               className="flex justify-start"
             >
-              <div className="bg-zinc-100 rounded-2xl rounded-bl-sm px-5 py-3 border border-zinc-200 flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                <span className="text-xs text-zinc-500">Pico is thinking...</span>
+              <div className="bg-[#131b3b] rounded-2xl rounded-bl-sm px-5 py-3 border border-[#1e2753] flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                <span className="text-xs text-slate-400">Pico is thinking...</span>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <div className="p-4 bg-white border-t">
+      <div className="p-4 bg-[#0a0f24] border-t border-[#1e2753]">
         <div className="flex gap-2 relative">
           <Button 
             onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}
             variant="ghost"
-            className={`rounded-full w-12 h-12 p-0 flex items-center justify-center transition-colors ${isVoiceEnabled ? 'text-blue-600 bg-blue-50' : 'text-zinc-400'}`}
+            className={`rounded-full w-12 h-12 p-0 flex items-center justify-center transition-colors ${isVoiceEnabled ? 'text-blue-400 bg-[#131b3b]' : 'text-slate-500 hover:bg-[#131b3b]'}`}
           >
             {isVoiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
           </Button>
@@ -122,14 +122,14 @@ export function ChatInterface() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="What's an API?" 
-            className="flex-1 rounded-full bg-zinc-100 border-transparent px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+            className="flex-1 rounded-full bg-[#131b3b] text-slate-100 border-transparent px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-500"
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             disabled={isLoading}
           />
           <Button 
             onClick={handleSend} 
             disabled={isLoading || !input.trim()}
-            className="rounded-full w-12 h-12 p-0 flex items-center justify-center bg-blue-600 hover:bg-blue-700 shadow-md transition-transform active:scale-95"
+            className="rounded-full w-12 h-12 p-0 flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white shadow-md transition-transform active:scale-95 disabled:opacity-50"
           >
             <Send className="w-5 h-5 ml-1" />
           </Button>
