@@ -16,7 +16,15 @@ cp .env.example .env
 ```
 *(You will need your MongoDB Atlas URI, ElevenLabs API Key, and your local/remote Gemma 4 endpoint).*
 
-### 3. Run the App
+### 3. Run Temporal (Free Open-Source Cluster)
+To execute the durable push notification cron workflows without paying for Temporal Cloud, self-host the open-source Temporal cluster locally using Docker:
+```bash
+git clone https://github.com/temporalio/docker-compose.git
+cd docker-compose
+docker-compose up
+```
+
+### 4. Run the App
 ```bash
 npm run dev
 ```
