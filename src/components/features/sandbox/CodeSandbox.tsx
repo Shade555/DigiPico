@@ -22,8 +22,8 @@ export function CodeSandbox({ defaultCode = "console.log('Hello World!');" }: { 
       // eslint-disable-next-line no-eval
       eval(code);
       if (logs.length === 0) logs.push("Execution completed with no output.");
-    } catch (e: any) {
-      logs.push(`Error: ${e.message}`);
+    } catch (e: unknown) {
+      logs.push(`Error: ${e instanceof Error ? e.message : String(e)}`);
     }
 
     // Restore console.log
