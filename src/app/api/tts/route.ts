@@ -22,7 +22,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           text,
-          model_id: "eleven_monolingual_v1",
+          model_id: "eleven_multilingual_v2",
           voice_settings: {
             stability: 0.5,
             similarity_boost: 0.75,
@@ -32,7 +32,9 @@ export async function POST(req: Request) {
     );
 
     if (!response.ok) {
-      throw new Error(`ElevenLabs API error: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error("ElevenLabs Detailed Error:", errorText);
+      throw new Error(`ElevenLabs API error: ${response.statusText} - ${errorText}`);
     }
 
     const audioBuffer = await response.arrayBuffer();
