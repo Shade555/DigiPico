@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PicoMascot } from "@/components/features/pico/PicoMascot";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Loader2, Volume2, VolumeX, History, Trash2, ArrowLeft } from "lucide-react";
+import { Send, Loader2, History, Trash2, ArrowLeft } from "lucide-react";
 import { textToSpeech } from "@/lib/audio";
 
 export function ChatInterface() {

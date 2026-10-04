@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { PicoMascot } from "@/components/features/pico/PicoMascot";
 import { calculateLevel, getPicoStage, ACHIEVEMENTS } from "@/lib/gamification";
-import { showLocalNotification } from "@/lib/notifications";
 import { Button } from "@/components/ui/button";
-import { BellRing, Loader2 } from "lucide-react";
+import { BellRing, Loader2, Flame, Trophy, HelpCircle, Hammer, Globe, Rocket, Brain, Leaf, Search } from "lucide-react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [userData, setUserData] = useState<{ xp: number; streak: number; achievements: string[] } | null>(null);
 
   useEffect(() => {
@@ -26,10 +27,25 @@ export default function ProfilePage() {
   }, []);
 
   const testPushNotification = async () => {
-    await showLocalNotification(
-      "Pico's Daily Tech Discovery 🐣", 
-      "Did you know? Gemma 4 was just released with amazing new visual reasoning capabilities!"
-    );
+    // Basic Notification API
+    if (!("Notification" in window)) {
+      alert("This browser does not support desktop notification");
+      return;
+    }
+
+    if (Notification.permission === "granted") {
+      new Notification("Pico's Daily Tech Discovery", {
+        body: "Did you know? Gemma 4 was just released with amazing new visual reasoning capabilities!",
+        icon: "/pico-icon.png" // Fallback icon
+      });
+    } else if (Notification.permission !== "denied") {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        new Notification("Pico's Daily Tech Discovery", {
+          body: "Did you know? Gemma 4 was just released with amazing new visual reasoning capabilities!"
+        });
+      }
+    }
   };
 
   if (!userData) {
@@ -53,7 +69,10 @@ export default function ProfilePage() {
         <div className="bg-[#131b3b] p-6 rounded-full shadow-inner mb-4">
           <PicoMascot size="lg" mood="excited" />
         </div>
-        <h2 className="text-xl font-bold mt-2">Level {level}: {stage.name}</h2>
+        <h2 className="text-xl font-bold mt-2 flex items-center gap-2">
+          Level {level}: {stage.name.replace(/^[^\w]*/, '')} 
+          {level <= 3 ? <Search className="w-5 h-5 text-yellow-500" /> : level <= 6 ? <Leaf className="w-5 h-5 text-green-500" /> : level <= 9 ? <Brain className="w-5 h-5 text-pink-500" /> : <Rocket className="w-5 h-5 text-blue-500" />}
+        </h2>
         <p className="text-sm text-slate-400 mt-1 text-center max-w-xs">{stage.description}</p>
         <p className="text-xs text-blue-400 font-bold mt-4 tracking-wider uppercase">{userData.xp} / {nextLevelXp} XP</p>
         
@@ -69,12 +88,12 @@ export default function ProfilePage() {
 
       <section className="grid grid-cols-2 gap-4">
         <div className="bg-[#0a0f24] border border-[#1e2753] rounded-2xl p-4 text-center shadow-md">
-          <div className="text-3xl mb-2 drop-shadow-md">🔥</div>
+          <div className="flex justify-center mb-2 drop-shadow-md"><Flame className="w-8 h-8 text-orange-500" /></div>
           <div className="font-bold text-2xl text-slate-100">{userData.streak} Days</div>
           <div className="text-xs text-slate-400 font-medium">Learning Streak</div>
         </div>
         <div className="bg-[#0a0f24] border border-[#1e2753] rounded-2xl p-4 text-center shadow-md">
-          <div className="text-3xl mb-2 drop-shadow-md">🏆</div>
+          <div className="flex justify-center mb-2 drop-shadow-md"><Trophy className="w-8 h-8 text-yellow-500" /></div>
           <div className="font-bold text-2xl text-slate-100">{userData.achievements.length}</div>
           <div className="text-xs text-slate-400 font-medium">Achievements</div>
         </div>
@@ -84,7 +103,7 @@ export default function ProfilePage() {
         <div className="flex justify-between items-center mb-5 border-b border-[#1e2753] pb-4">
           <div>
             <h3 className="font-bold text-slate-100">Daily Tech News</h3>
-            <p className="text-xs text-slate-400 mt-1">Get push notifications via Temporal Cron.</p>
+            <p className="text-xs text-slate-400 mt-1">Get push notifications via browser API.</p>
           </div>
           <Button onClick={testPushNotification} size="icon" className="rounded-full shadow-lg bg-[#131b3b] text-blue-400 border border-[#1e2753] hover:bg-blue-600 hover:text-white transition-colors">
             <BellRing className="w-4 h-4" />
@@ -104,7 +123,12 @@ export default function ProfilePage() {
                 transition={{ delay: i * 0.1 }}
                 className="flex items-center gap-4 bg-[#131b3b] p-3 rounded-xl border border-[#1e2753]"
               >
-                <div className="text-3xl bg-[#0a0f24] p-2 rounded-lg shadow-inner">{achievement.icon}</div>
+                <div className="bg-[#0a0f24] p-3 rounded-lg shadow-inner">
+                  {achievement.id === "first_question" ? <HelpCircle className="w-6 h-6 text-purple-400" /> : 
+                   achievement.id === "streak_3" ? <Flame className="w-6 h-6 text-orange-500" /> : 
+                   achievement.id === "first_project" ? <Hammer className="w-6 h-6 text-slate-400" /> : 
+                   <Globe className="w-6 h-6 text-blue-400" />}
+                </div>
                 <div>
                   <p className="text-sm font-bold text-slate-200">{achievement.title}</p>
                   <p className="text-xs text-slate-400 mt-0.5">{achievement.description}</p>
@@ -153,7 +177,7 @@ export default function ProfilePage() {
             localStorage.removeItem("digipico_user_id");
             localStorage.removeItem("digipico_interest");
             localStorage.removeItem("digipico_interests");
-            window.location.href = "/auth";
+            router.push("/auth");
           }}
         >
           Log Out
@@ -164,7 +188,7 @@ export default function ProfilePage() {
           onClick={() => {
             if (confirm("Are you sure you want to delete your account? All progress will be lost.")) {
               localStorage.clear();
-              window.location.href = "/auth";
+              router.push("/auth");
             }
           }}
         >

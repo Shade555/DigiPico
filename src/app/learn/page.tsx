@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface Step {
   id: number;
@@ -21,6 +22,7 @@ interface LearningPath {
 }
 
 export default function LearnPage() {
+  const router = useRouter();
   const [learningPath, setLearningPath] = useState<LearningPath | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -78,7 +80,7 @@ export default function LearnPage() {
           <h1 className="text-4xl font-black tracking-tight text-white mb-2">Curriculum</h1>
           <p className="text-blue-300 font-medium text-sm">AI-generated personalized learning path</p>
         </div>
-        <Button onClick={() => window.location.href = '/quiz'} className="bg-purple-600 hover:bg-purple-500 rounded-xl shadow-md">
+        <Button onClick={() => router.push('/quiz')} className="bg-purple-600 hover:bg-purple-500 rounded-xl shadow-md">
           Take Quiz
         </Button>
       </header>
@@ -185,7 +187,7 @@ export default function LearnPage() {
                   <Button 
                     onClick={() => {
                       localStorage.setItem("digipico_start_lesson", `Hi Pico! I am ready to start learning about "${step.title}" for ${learningPath.topic}. Can you act as my tutor and explain it to me simply?`);
-                      window.location.href = "/";
+                      router.push("/");
                     }}
                     size="sm" 
                     className="flex-1 rounded-xl bg-white text-black hover:bg-slate-200 font-bold transition-transform active:scale-95 shadow-md"

@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, Trophy } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Question {
   id: number;
@@ -15,6 +16,7 @@ interface Question {
 }
 
 export default function QuizPage() {
+  const router = useRouter();
   const [quiz, setQuiz] = useState<{ topic: string, questions: Question[] } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -74,7 +76,7 @@ export default function QuizPage() {
         });
       }
       alert(`Quiz Finished! You scored ${score + (selectedOpt === quiz?.questions[currentIdx].correctIndex && !showResult ? 1 : 0)}/${quiz?.questions.length}. XP added!`);
-      window.location.href = "/learn";
+      router.push("/learn");
     }
   };
 
