@@ -2,8 +2,7 @@ import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  ...(process.env.STATIC_EXPORT ? { output: "export" } : {}),
-  images: { unoptimized: true },
+  /* config options here */
 };
 
 export default withSentryConfig(nextConfig, {
@@ -43,5 +42,3 @@ export default withSentryConfig(nextConfig, {
     },
   }
 });
-
-
