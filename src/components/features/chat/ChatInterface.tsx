@@ -10,7 +10,6 @@ export function ChatInterface() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -22,15 +21,16 @@ export function ChatInterface() {
       window.location.href = "/auth";
     } else {
       const history = localStorage.getItem("digipico_chat_history");
+      const savedThreadId = localStorage.getItem("digipico_thread_id");
       if (history) {
         try {
-          setMessages(JSON.parse(history));
+          setTimeout(() => setMessages(JSON.parse(history)), 0);
+          if (savedThreadId) setThreadId(savedThreadId);
         } catch (e) {
           console.error("Could not parse chat history", e);
         }
       }
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsCheckingAuth(false);
+      setTimeout(() => setIsCheckingAuth(false), 0);
     }
   }, []);
 
@@ -63,19 +63,22 @@ export function ChatInterface() {
       
       if (data.threadId) {
         setThreadId(data.threadId);
+        localStorage.setItem("digipico_thread_id", data.threadId);
       }
       
       if (data.content) {
         setMessages([...newMessages, { role: "assistant", content: data.content }]);
         
-        if (isVoiceEnabled) {
+        try {
           const audioBuffer = await textToSpeech(data.content);
           if (audioBuffer) {
             const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
             const url = URL.createObjectURL(blob);
             const audio = new Audio(url);
-            audio.play();
+            audio.play().catch(e => console.log("Audio playback failed quietly:", e));
           }
+        } catch (e) {
+          console.log("TTS failed quietly:", e);
         }
       }
     } catch (error) {
@@ -138,13 +141,6 @@ export function ChatInterface() {
 
       <div className="p-4 bg-[#0a0f24] border-t border-[#1e2753]">
         <div className="flex gap-2 relative">
-          <Button 
-            onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}
-            variant="ghost"
-            className={`rounded-full w-12 h-12 p-0 flex items-center justify-center transition-colors ${isVoiceEnabled ? 'text-blue-400 bg-[#131b3b]' : 'text-slate-500 hover:bg-[#131b3b]'}`}
-          >
-            {isVoiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-          </Button>
           <input 
             type="text" 
             value={input}

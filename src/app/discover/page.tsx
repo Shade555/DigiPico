@@ -35,7 +35,8 @@ export default function DiscoverPage() {
     fetchDiscoveries();
   }, []);
 
-  const container: any = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const container: any = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -43,7 +44,8 @@ export default function DiscoverPage() {
     }
   };
 
-  const item: any = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const item: any = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
   };

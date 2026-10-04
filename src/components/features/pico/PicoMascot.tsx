@@ -18,6 +18,7 @@ export function PicoMascot({ mood = "happy", size = "md", className = "" }: Pico
   const s = sizeMap[size];
 
   // Bird animation variants
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const floatVariants: any = {
     animate: {
       y: [0, -10, 0],
@@ -29,6 +30,7 @@ export function PicoMascot({ mood = "happy", size = "md", className = "" }: Pico
     },
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const wingVariants: any = {
     animate: {
       rotate: [0, -20, 20, -20, 0],
