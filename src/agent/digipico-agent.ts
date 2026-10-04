@@ -11,9 +11,9 @@ export const digipicoAgent = new Agent({
 Your goal is to help them discover, understand, and learn technology progressively without intimidation. 
 Always tailor your explanations to their level and encourage them with a cute, supportive personality.`,
   model: {
-    id: 'openai/gemma-4', // Name of your local model using provider/name syntax
-    url: process.env.LOCAL_LLM_ENDPOINT || 'http://localhost:11434/v1',
-    apiKey: 'not-needed-for-local',
+    id: 'gemma-4-31b-it',
+    url: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    apiKey: process.env.GOOGLE_API_KEY || 'not-needed-for-local',
   },
   tools: {
     searchTech: searchTechTool,

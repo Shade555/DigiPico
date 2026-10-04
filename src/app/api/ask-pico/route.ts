@@ -1,83 +1,43 @@
 import { NextResponse } from 'next/server';
+import { digipicoAgent } from '@/agent/digipico-agent';
+import { BackboardClient } from 'backboard-sdk';
+
+const backboardClient = new BackboardClient({ 
+  apiKey: process.env.BACKBOARD_API_KEY || 'espr_NEEDKMyVRgVD9Ky-TnM5BpO-u8wnUSQGwXF9JWJJUOc' 
+});
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
-    const hfApiKey = process.env.HUGGINGFACE_API_KEY;
-    const googleApiKey = process.env.GOOGLE_API_KEY;
+    const { messages, threadId } = await req.json();
 
-    if (!hfApiKey && !googleApiKey) {
-      throw new Error("Missing API keys in environment variables.");
-    }
-
-    // We append a system prompt to ensure Pico stays in character
     const formattedMessages = [
       { role: "system", content: "You are Pico, a friendly blue penguin tutor. You explain technology concepts simply, using emojis, to a beginner audience. Keep responses under 4 sentences. CRITICAL: Do NOT output any internal <thought> blocks or tags. Only output the final response." },
-      ...messages.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content }))
+      ...messages
     ];
 
-    let response;
-    
-    if (googleApiKey) {
-      console.log("Routing via Google AI Studio...");
-      response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${googleApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gemma-4-31b-it", // Using Gemma 4 per user request
-          messages: formattedMessages,
-          max_tokens: 500,
-        }),
-      });
-    } else {
-      console.log("Routing via Hugging Face Serverless Inference...");
-      response = await fetch("https://api-inference.huggingface.co/models/google/gemma-4-E4B-it/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${hfApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gemma-4-31b-it",
-          messages: formattedMessages,
-          max_tokens: 500,
-        }),
-      });
-    }
+    console.log("Routing via Mastra Agent + Backboard Memory...");
+    const response = await digipicoAgent.generate(formattedMessages, { 
+      threadId,
+      memory: backboardClient 
+    });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("API Error:", errorText);
-      if (response.status === 503) {
-        throw new Error("Pico is currently waking up from a nap! Please wait 30 seconds and try again.");
-      }
-      throw new Error(`API returned status ${response.status}: ${errorText}`);
-    }
-
-    const data = await response.json();
-    let reply = data.choices?.[0]?.message?.content || "Oops, I got confused! Try asking again.";
+    let reply = response.text || "Oops, I got confused! Try asking again.";
     
-    // Strip <thought>...</thought> blocks if the model leaked them
+    // Strip <thought> tags
     reply = reply.replace(/<thought>[\s\S]*?<\/thought>/gi, "").trim();
 
     return NextResponse.json({
       content: reply,
+      threadId: response.threadId || threadId
     });
   } catch (error: unknown) {
-    console.error("API Route Error:", error);
+    console.error("Mastra API Route Error:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-    
-    if (errorMessage.includes("waking up")) {
-      return NextResponse.json({ content: errorMessage });
-    }
     
     // Ultimate fallback
     console.log("Using safe Hackathon fallback.");
     return NextResponse.json({ 
-      content: `I couldn't connect to the AI! Error: ${errorMessage}. Did you restart your Next.js server after adding the API key?` 
+      content: `I couldn't connect to Mastra! Error: ${errorMessage}.` 
     });
   }
 }
