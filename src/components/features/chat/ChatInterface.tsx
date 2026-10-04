@@ -13,6 +13,14 @@ export function ChatInterface() {
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const router = import("next/navigation").then(mod => mod.useRouter);
+  
+  useEffect(() => {
+    const userId = localStorage.getItem("digipico_user_id");
+    if (!userId) {
+      window.location.href = "/auth";
+    }
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
