@@ -114,6 +114,36 @@ export default function ProfilePage() {
           })}
         </ul>
       </section>
+
+      <section className="bg-[#0a0f24] border border-[#1e2753] rounded-2xl p-5 shadow-md mt-4">
+        <h3 className="font-bold mb-2 text-slate-100">Add New Learning Path</h3>
+        <p className="text-xs text-slate-400 mb-4">Add a new tech topic. It will instantly generate a new curriculum on your Learn tab!</p>
+        <div className="flex gap-2">
+          <input 
+            type="text"
+            id="newInterestInput"
+            placeholder="e.g. Next.js, Python, DevOps"
+            className="flex-1 bg-[#131b3b] border border-[#1e2753] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+          />
+          <Button onClick={() => {
+            const input = document.getElementById('newInterestInput') as HTMLInputElement;
+            if (input.value.trim()) {
+              const current = JSON.parse(localStorage.getItem("digipico_interests") || "[]");
+              if (current.length === 0) {
+                // Migrate legacy string
+                const legacy = localStorage.getItem("digipico_interest");
+                if (legacy) current.push(legacy);
+              }
+              current.push(input.value.trim());
+              localStorage.setItem("digipico_interests", JSON.stringify([...new Set(current)]));
+              input.value = "";
+              alert("New Learning Path Added! Check the Learn tab.");
+            }
+          }} className="bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md">
+            Add
+          </Button>
+        </div>
+      </section>
     </main>
   );
 }

@@ -10,14 +10,30 @@ export default function BuildPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [codeOutputs, setCodeOutputs] = useState<Record<number, string>>({});
 
+  const [topics, setTopics] = useState<string[]>([]);
+  const [selectedTopic, setSelectedTopic] = useState<string>("");
+
   useEffect(() => {
+    let storedTopics = JSON.parse(localStorage.getItem("digipico_interests") || "[]");
+    if (storedTopics.length === 0) {
+      const legacy = localStorage.getItem("digipico_interest") || "artificial intelligence";
+      storedTopics = [legacy];
+      localStorage.setItem("digipico_interests", JSON.stringify(storedTopics));
+    }
+    setTopics(storedTopics);
+    setSelectedTopic(storedTopics[0]);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedTopic) return;
+    
     async function fetchChallenges() {
+      setIsLoading(true);
       try {
-        const userInterest = localStorage.getItem("digipico_interest") || "artificial intelligence";
         const res = await fetch("/api/build", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ interest: userInterest })
+          body: JSON.stringify({ interest: selectedTopic })
         });
         const data = await res.json();
         setChallenges(data);
@@ -28,7 +44,7 @@ export default function BuildPage() {
       }
     }
     fetchChallenges();
-  }, []);
+  }, [selectedTopic]);
 
   const runCode = async (id: number, template: string) => {
     setCodeOutputs(prev => ({ ...prev, [id]: "Running..." }));
@@ -43,7 +59,7 @@ export default function BuildPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || challenges.length === 0) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#080b1a]">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -57,6 +73,25 @@ export default function BuildPage() {
         <h1 className="text-3xl font-black tracking-tight text-slate-100">Hands-on</h1>
         <p className="text-slate-400 font-medium mt-1">Learn by doing. Complete tiny challenges.</p>
       </header>
+
+      {/* Topic Tabs */}
+      {topics.length > 1 && (
+        <div className="flex overflow-x-auto pb-2 gap-2 snap-x scrollbar-hide">
+          {topics.map((t) => (
+            <button
+              key={t}
+              onClick={() => setSelectedTopic(t)}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all snap-start ${
+                selectedTopic === t 
+                  ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" 
+                  : "bg-[#131b3b] text-slate-400 border border-[#1e2753] hover:text-slate-200"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="space-y-4">
         {challenges.map((challenge, i) => (

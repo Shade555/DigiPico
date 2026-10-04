@@ -9,15 +9,31 @@ export default function LearnPage() {
   const [learningPath, setLearningPath] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [topics, setTopics] = useState<string[]>([]);
+  const [selectedTopic, setSelectedTopic] = useState<string>("");
+
   useEffect(() => {
+    // Load topics from local storage
+    let storedTopics = JSON.parse(localStorage.getItem("digipico_interests") || "[]");
+    if (storedTopics.length === 0) {
+      const legacy = localStorage.getItem("digipico_interest") || "Introduction to AI";
+      storedTopics = [legacy];
+      localStorage.setItem("digipico_interests", JSON.stringify(storedTopics));
+    }
+    setTopics(storedTopics);
+    setSelectedTopic(storedTopics[0]);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedTopic) return;
+    
     async function fetchPath() {
+      setIsLoading(true);
       try {
-        const userTopic = localStorage.getItem("digipico_interest") || "Introduction to AI";
-        
         const res = await fetch("/api/learn", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ topic: userTopic })
+          body: JSON.stringify({ topic: selectedTopic })
         });
         const data = await res.json();
         setLearningPath(data);
@@ -28,7 +44,7 @@ export default function LearnPage() {
       }
     }
     fetchPath();
-  }, []);
+  }, [selectedTopic]);
 
   if (isLoading || !learningPath) {
     return (
@@ -44,6 +60,25 @@ export default function LearnPage() {
         <h1 className="text-4xl font-black tracking-tight text-white mb-2">Curriculum</h1>
         <p className="text-blue-300 font-medium text-sm">AI-generated personalized learning path</p>
       </header>
+
+      {/* Topic Tabs */}
+      {topics.length > 1 && (
+        <div className="flex overflow-x-auto pb-2 gap-2 snap-x scrollbar-hide">
+          {topics.map((t) => (
+            <button
+              key={t}
+              onClick={() => setSelectedTopic(t)}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all snap-start ${
+                selectedTopic === t 
+                  ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" 
+                  : "bg-[#131b3b] text-slate-400 border border-[#1e2753] hover:text-slate-200"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
 
       {learningPath.error ? (
         <div className="p-6 bg-red-900/20 rounded-2xl border border-red-500/30 text-red-200 text-center mt-10">
