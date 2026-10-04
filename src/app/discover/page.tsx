@@ -12,7 +12,8 @@ export default function DiscoverPage() {
   useEffect(() => {
     async function fetchDiscoveries() {
       try {
-        const res = await fetch('/api/discover');
+        const userInterest = localStorage.getItem("digipico_interest") || "artificial intelligence";
+        const res = await fetch(`/api/discover?interest=${encodeURIComponent(userInterest)}`);
         const data = await res.json();
         if (data.news) {
           setDiscoveries(data.news);

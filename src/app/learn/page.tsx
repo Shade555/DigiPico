@@ -12,10 +12,12 @@ export default function LearnPage() {
   useEffect(() => {
     async function fetchPath() {
       try {
+        const userTopic = localStorage.getItem("digipico_interest") || "Introduction to AI";
+        
         const res = await fetch("/api/learn", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ topic: "Introduction to AI" })
+          body: JSON.stringify({ topic: userTopic })
         });
         const data = await res.json();
         setLearningPath(data);

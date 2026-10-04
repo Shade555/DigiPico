@@ -13,7 +13,12 @@ export default function BuildPage() {
   useEffect(() => {
     async function fetchChallenges() {
       try {
-        const res = await fetch("/api/build");
+        const userInterest = localStorage.getItem("digipico_interest") || "artificial intelligence";
+        const res = await fetch("/api/build", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ interest: userInterest })
+        });
         const data = await res.json();
         setChallenges(data);
       } catch (e) {

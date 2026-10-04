@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const interest = searchParams.get("interest") || "artificial intelligence";
   const apiKey = process.env.SERPAPI_API_KEY;
   
   if (!apiKey) {
@@ -8,9 +10,9 @@ export async function GET() {
     return NextResponse.json({
       news: [
         {
-          title: "Gemma 4 Released!",
-          description: "Google just released a new AI model with multimodality capabilities.",
-          type: "AI Model",
+          title: `Latest ${interest} Trends`,
+          description: `The world of ${interest} is evolving rapidly. Click to learn more!`,
+          type: "Tech News",
           time: "Just now",
         },
         {
@@ -24,8 +26,9 @@ export async function GET() {
   }
 
   try {
-    // Call SerpApi Google News for "artificial intelligence OR developer hackathons"
-    const res = await fetch(`https://serpapi.com/search.json?engine=google_news&q=artificial+intelligence+OR+developer+hackathons&api_key=${apiKey}`);
+    // Call SerpApi Google News dynamically using the user's interest
+    const encodedQuery = encodeURIComponent(`${interest} technology OR tutorial OR news`);
+    const res = await fetch(`https://serpapi.com/search.json?engine=google_news&q=${encodedQuery}&api_key=${apiKey}`);
     const data = await res.json();
     
     // Transform SerpApi results to our Discover card format

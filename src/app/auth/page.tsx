@@ -23,6 +23,12 @@ export default function AuthPage() {
     setTimeout(() => {
       // Simple Hackathon Auth: We just save their email as the User ID in localStorage
       localStorage.setItem("digipico_user_id", email.toLowerCase());
+      
+      if (!isLogin) {
+        const interest = (document.getElementById("interestInput") as HTMLInputElement)?.value || "Introduction to AI";
+        localStorage.setItem("digipico_interest", interest);
+      }
+      
       router.push("/");
     }, 1500);
   };
@@ -75,6 +81,18 @@ export default function AuthPage() {
               className="w-full bg-[#131b3b] border border-[#1e2753] rounded-2xl py-4 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             />
           </div>
+
+          {!isLogin && (
+            <div className="relative">
+              <input 
+                type="text" 
+                placeholder="What do you want to learn? (e.g. Robotics, React)" 
+                required
+                id="interestInput"
+                className="w-full bg-[#131b3b] border border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.15)] rounded-2xl py-4 px-5 text-slate-100 placeholder:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              />
+            </div>
+          )}
 
           <Button 
             type="submit" 
