@@ -45,7 +45,14 @@ export default function LearnPage() {
         <p className="text-blue-300 font-medium text-sm">AI-generated personalized learning path</p>
       </header>
 
-      {/* Progress Card */}
+      {learningPath.error ? (
+        <div className="p-6 bg-red-900/20 rounded-2xl border border-red-500/30 text-red-200 text-center mt-10">
+          <p className="font-bold mb-2">Couldn't generate curriculum</p>
+          <p className="text-sm opacity-80">{learningPath.error}. Try signing up with a more common tech topic!</p>
+        </div>
+      ) : (
+        <>
+          {/* Progress Card */}
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -125,6 +132,8 @@ export default function LearnPage() {
           </motion.div>
         ))}
       </div>
+      </>
+      )}
     </main>
   );
 }
