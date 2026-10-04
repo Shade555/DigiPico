@@ -39,3 +39,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: e instanceof Error ? e.message : 'Unknown' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get('userId');
+    if (!userId) return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+
+    const client = await clientPromise;
+    const db = client.db('digipico');
+    
+    await db.collection('users').deleteOne({ _id: new ObjectId(userId) });
+    
+    return NextResponse.json({ success: true });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'Unknown' }, { status: 500 });
+  }
+}

@@ -185,8 +185,12 @@ export default function ProfilePage() {
         <Button 
           variant="destructive" 
           className="w-full bg-red-900/50 hover:bg-red-900 text-red-200 border border-red-900"
-          onClick={() => {
-            if (confirm("Are you sure you want to delete your account? All progress will be lost.")) {
+          onClick={async () => {
+            if (confirm("Are you sure you want to delete your account? All progress will be lost forever.")) {
+              const userId = localStorage.getItem("digipico_user_id");
+              if (userId) {
+                await fetch(`/api/user?userId=${userId}`, { method: 'DELETE' });
+              }
               localStorage.clear();
               router.push("/auth");
             }
