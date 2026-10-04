@@ -1,15 +1,16 @@
 "use client";
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PicoMascot } from "@/components/features/pico/PicoMascot";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Volume2, VolumeX } from "lucide-react";
+import { textToSpeech } from "@/lib/audio";
 
 export function ChatInterface() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,6 +37,16 @@ export function ChatInterface() {
       
       if (data.content) {
         setMessages([...newMessages, { role: "assistant", content: data.content }]);
+        
+        if (isVoiceEnabled) {
+          const audioBuffer = await textToSpeech(data.content);
+          if (audioBuffer) {
+            const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            audio.play();
+          }
+        }
       }
     } catch (error) {
       console.error("Error talking to Pico:", error);
@@ -94,6 +105,13 @@ export function ChatInterface() {
 
       <div className="p-4 bg-white border-t">
         <div className="flex gap-2 relative">
+          <Button 
+            onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}
+            variant="ghost"
+            className={`rounded-full w-12 h-12 p-0 flex items-center justify-center transition-colors ${isVoiceEnabled ? 'text-blue-600 bg-blue-50' : 'text-zinc-400'}`}
+          >
+            {isVoiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+          </Button>
           <input 
             type="text" 
             value={input}
