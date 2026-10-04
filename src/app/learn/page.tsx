@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/lib/api";
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -49,7 +50,7 @@ export default function LearnPage() {
     async function fetchPath() {
       setIsLoading(true);
       try {
-        const res = await fetch("/api/learn", {
+        const res = await fetch(apiUrl("/api/learn"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ topic: selectedTopic })
@@ -214,9 +215,9 @@ export default function LearnPage() {
                         try {
                           const userId = localStorage.getItem("digipico_user_id");
                           if (userId && userId.length === 24) {
-                            const pRes = await fetch(`/api/profile?userId=${userId}`);
+                            const pRes = await fetch(apiUrl(`/api/profile?userId=${userId}`));
                             const pData = await pRes.json();
-                            await fetch("/api/user", {
+                            await fetch(apiUrl("/api/user"), {
                               method: "POST",
                               headers: { "Content-Type": "application/json" },
                               body: JSON.stringify({

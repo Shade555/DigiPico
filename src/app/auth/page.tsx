@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/lib/api";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,7 +22,7 @@ export default function AuthPage() {
     const password = (document.getElementById("passwordInput") as HTMLInputElement)?.value;
     
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch(apiUrl("/api/auth"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

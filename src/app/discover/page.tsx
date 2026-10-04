@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/lib/api";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ export default function DiscoverPage() {
     async function fetchDiscoveries() {
       try {
         const userInterest = localStorage.getItem("digipico_interest") || "artificial intelligence";
-        const res = await fetch(`/api/discover?interest=${encodeURIComponent(userInterest)}`);
+        const res = await fetch(apiUrl(`/api/discover?interest=${encodeURIComponent(userInterest)}`));
         const data = await res.json();
         if (data.news) {
           setDiscoveries(data.news);

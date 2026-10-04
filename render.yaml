@@ -1,15 +1,18 @@
 services:
   - type: web
-    name: digipico-web
+    name: digipico-api
     env: node
+    rootDir: backend
     buildCommand: npm install && npm run build
-    startCommand: npm run start
+    startCommand: npm start
     envVars:
-      - key: NODE_ENV
-        value: production
       - key: MONGODB_URI
         sync: false
-      - key: ELEVENLABS_API_KEY
+      - key: GOOGLE_API_KEY
         sync: false
-      - key: GEMMA_API_KEY
+      - key: SERPAPI_API_KEY
+        sync: false
+      - key: BACKBOARD_API_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
         sync: false

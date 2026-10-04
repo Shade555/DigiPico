@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/lib/api";
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -42,7 +43,7 @@ export default function BuildPage() {
     async function fetchChallenges() {
       setIsLoading(true);
       try {
-        const res = await fetch("/api/build", {
+        const res = await fetch(apiUrl("/api/build"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ interest: selectedTopic })

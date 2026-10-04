@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/lib/api";
 
 import { useEffect, useState } from "react";
 import { PicoMascot } from "@/components/features/pico/PicoMascot";
@@ -16,7 +17,7 @@ export default function ProfilePage() {
     async function fetchProfile() {
       try {
         const userId = localStorage.getItem("digipico_user_id") || "test_user_123";
-        const res = await fetch(`/api/profile?userId=${userId}`);
+        const res = await fetch(apiUrl(`/api/profile?userId=${userId}`));
         const data = await res.json();
         setUserData(data);
       } catch (e) {
@@ -190,7 +191,7 @@ export default function ProfilePage() {
             if (confirm("Are you sure you want to delete your account? All progress will be lost forever.")) {
               const userId = localStorage.getItem("digipico_user_id");
               if (userId) {
-                await fetch(`/api/user?userId=${userId}`, { method: 'DELETE' });
+                await fetch(apiUrl(`/api/user?userId=${userId}`, { method: 'DELETE' });
               }
               localStorage.clear();
               router.push("/auth");

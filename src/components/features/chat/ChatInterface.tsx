@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/lib/api";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PicoMascot } from "@/components/features/pico/PicoMascot";
@@ -98,7 +99,7 @@ export function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/ask-pico", {
+      const res = await fetch(apiUrl("/api/ask-pico"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: newMessages, threadId }),

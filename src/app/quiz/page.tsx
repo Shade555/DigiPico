@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/lib/api";
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -29,7 +30,7 @@ export default function QuizPage() {
       try {
         const topics = JSON.parse(localStorage.getItem("digipico_interests") || "[]");
         const topic = topics.length > 0 ? topics[0] : "Artificial Intelligence";
-        const res = await fetch("/api/quiz", {
+        const res = await fetch(apiUrl("/api/quiz"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ topic })
@@ -64,9 +65,9 @@ export default function QuizPage() {
       // Finished
       const userId = localStorage.getItem("digipico_user_id");
       if (userId && userId.length === 24) {
-        const pRes = await fetch(`/api/profile?userId=${userId}`);
+        const pRes = await fetch(apiUrl(`/api/profile?userId=${userId}`));
         const pData = await pRes.json();
-        await fetch("/api/user", {
+        await fetch(apiUrl("/api/user"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
