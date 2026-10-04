@@ -17,14 +17,14 @@ export async function POST(req: Request) {
       ...messages.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content }))
     ];
 
-    const response = await fetch("https://api-inference.huggingface.co/models/google/gemma-3-4b-it/v1/chat/completions", {
+    const response = await fetch("https://api-inference.huggingface.co/models/google/gemma-2-9b-it/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${hfApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemma-3-4b-it",
+        model: "google/gemma-2-9b-it",
         messages: formattedMessages,
         max_tokens: 500,
       }),
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       if (response.status === 503) {
         throw new Error("Pico is currently waking up from a nap! (Hugging Face model is loading into memory). Please wait 30 seconds and try again.");
       }
-      throw new Error(`Hugging Face API returned status ${response.status}`);
+      throw new Error(`Hugging Face API returned status ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     });
   } catch (error: unknown) {
     console.error("API Route Error:", error);
-    const errorMessage = error instanceof Error ? error.message : "";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
     
     if (errorMessage.includes("waking up")) {
       return NextResponse.json({ content: errorMessage });
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     // Ultimate fallback if Hugging Face API fails
     console.log("Using safe Hackathon fallback.");
     return NextResponse.json({ 
-      content: `I'm currently running in Hackathon Demo Mode! My connection to Hugging Face is temporarily asleep. But don't worry—your profile, dynamic Wikipedia curriculum, and code sandboxes are completely functional! Try exploring the Learn or Build tabs.` 
+      content: `I couldn't connect to Hugging Face! Error: ${errorMessage}. Did you restart your Next.js server after adding the API key?` 
     });
   }
 }
