@@ -27,7 +27,7 @@ export async function POST(req: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gemma-2-9b-it", // Using Gemma 2 (AI Studio standard)
+          model: "gemma-4-31b-it", // Using Gemma 4 per user request
           messages: formattedMessages,
           max_tokens: 500,
         }),
