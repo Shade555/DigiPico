@@ -57,7 +57,7 @@ function LoadingIndicator() {
         </AnimatePresence>
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/mascot.png" alt="Pico" className="w-20 h-20 opacity-80 animate-bounce mt-4" />
+      <img src="/icon.svg" alt="Pico" className="w-20 h-20 opacity-80 animate-bounce mt-4" />
     </div>
   );
 }

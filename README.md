@@ -15,9 +15,9 @@
 
 ```mermaid
 flowchart TD
-    User([📱 User / Capacitor Mobile]) --> |HTTPS| Render
+    User(["📱 User / Capacitor Mobile"]) --> |HTTPS| Render
     
-    subgraph Render [Render (Next.js Monolith)]
+    subgraph Render [Render Monolith]
         UI[Frontend UI]
         API[Backend API Routes]
         UI <--> API
@@ -31,16 +31,16 @@ flowchart TD
     
     API <-->|Prompt/Response| Mastra
     
-    Tools -->|Live Web Search| SerpApi[🌐 SerpApi]
-    Tools -->|Chat Memory| Backboard[🧠 Backboard]
+    Tools -->|Live Web Search| SerpApi["🌐 SerpApi"]
+    Tools -->|Chat Memory| Backboard["🧠 Backboard"]
     
-    Mastra <-->|Open-Weights LLM| Gemma[🤖 Gemma 4]
+    Mastra <-->|Open-Weights LLM| Gemma["🤖 Gemma 4"]
     
-    API <-->|Text-to-Speech| ElevenLabs[🗣️ ElevenLabs]
-    API <-->|Auth & Gamification| Mongo[(🍃 MongoDB Atlas)]
-    API <-->|Tech Readiness Prediction| TabPFN[📊 TabPFN]
+    API <-->|Text-to-Speech| ElevenLabs["🗣️ ElevenLabs"]
+    API <-->|Auth & Gamification| Mongo[("🍃 MongoDB Atlas")]
+    API <-->|Tech Readiness Prediction| TabPFN["📊 TabPFN"]
     
-    Render -->|Error & Agent Tracing| Sentry[👁️ Sentry]
+    Render -->|Error & Agent Tracing| Sentry["👁️ Sentry"]
 ```
 
 ## 📖 Overview
