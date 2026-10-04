@@ -11,14 +11,25 @@ export const searchTechTool = createTool({
     required: ['query'],
   },
   execute: async ({ context }: Record<string, unknown>) => {
-    // In a real implementation, this calls SerpApi
-    console.log(`Executing searchTech for: ${context.query}`);
-    return {
-      results: [
-        { title: 'Gemma 4 Released', snippet: 'Google releases Gemma 4 with new capabilities.' },
-        { title: 'Next.js 15 Updates', snippet: 'A beginner friendly look at the new router.' }
-      ]
-    };
+    console.log(`Executing live search for: ${context.query}`);
+    const apiKey = process.env.SERPAPI_API_KEY;
+    if (!apiKey) return { results: [{ title: 'SerpApi Key Missing', snippet: 'Configure SERPAPI_API_KEY in .env to enable live search.' }] };
+
+    try {
+      const q = encodeURIComponent(String(context.query));
+      const response = await fetch(`https://serpapi.com/search.json?q=${q}&engine=google&api_key=${apiKey}`);
+      const data = await response.json();
+      
+      const results = (data.organic_results || []).slice(0, 3).map((r: Record<string, unknown>) => ({
+        title: r.title,
+        snippet: r.snippet,
+        link: r.link
+      }));
+      
+      return { results };
+    } catch (e: unknown) {
+      return { results: [{ title: 'Search Error', snippet: e instanceof Error ? e.message : String(e) }] };
+    }
   }
 });
 
@@ -32,11 +43,25 @@ export const searchHackathonsTool = createTool({
     },
     required: ['topic'],
   },
-  execute: async () => {
-    return {
-      results: [
-        { name: 'DEV Weekend Challenge', description: 'Build for a friend hackathon.' }
-      ]
-    };
+  execute: async ({ context }: Record<string, unknown>) => {
+    console.log(`Executing live hackathon search for: ${context.topic}`);
+    const apiKey = process.env.SERPAPI_API_KEY;
+    if (!apiKey) return { results: [{ name: 'Key Missing', description: 'Configure SERPAPI_API_KEY' }] };
+
+    try {
+      const q = encodeURIComponent(`beginner friendly hackathon ${context.topic || ''}`);
+      const response = await fetch(`https://serpapi.com/search.json?q=${q}&engine=google&api_key=${apiKey}`);
+      const data = await response.json();
+      
+      const results = (data.organic_results || []).slice(0, 3).map((r: Record<string, unknown>) => ({
+        name: r.title,
+        description: r.snippet,
+        link: r.link
+      }));
+      
+      return { results };
+    } catch (e: unknown) {
+      return { results: [{ name: 'Search Error', description: e instanceof Error ? e.message : String(e) }] };
+    }
   }
 });

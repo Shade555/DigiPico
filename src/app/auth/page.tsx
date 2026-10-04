@@ -13,16 +13,32 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     
     setIsLoading(true);
+    const password = (document.getElementById("passwordInput") as HTMLInputElement)?.value;
     
-    // Simulate network delay for effect
-    setTimeout(() => {
-      // Simple Hackathon Auth: We just save their email as the User ID in localStorage
-      localStorage.setItem("digipico_user_id", email.toLowerCase());
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: email.toLowerCase(),
+          password: password,
+          action: isLogin ? "login" : "signup"
+        })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error);
+        setIsLoading(false);
+        return;
+      }
+      
+      localStorage.setItem("digipico_user_id", data.userId);
       
       if (!isLogin) {
         const interest = (document.getElementById("interestInput") as HTMLInputElement)?.value || "Introduction to AI";
@@ -30,7 +46,10 @@ export default function AuthPage() {
       }
       
       router.push("/discover");
-    }, 1500);
+    } catch (err) {
+      alert("Authentication failed.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -76,6 +95,7 @@ export default function AuthPage() {
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
             <input 
               type="password" 
+              id="passwordInput"
               placeholder="Password" 
               required
               className="w-full bg-[#131b3b] border border-[#1e2753] rounded-2xl py-4 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"

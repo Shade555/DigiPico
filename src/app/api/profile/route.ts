@@ -1,26 +1,38 @@
 import { NextResponse } from 'next/server';
-import { getUserProgress } from '@/db/progress';
+import clientPromise from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId") || "test_user_123"; // Dynamic based on auth!
+    const userId = searchParams.get("userId");
     
-    let progress = await getUserProgress(userId);
-    
-    if (!progress) {
-      // If the user is brand new, provide a starting template
-      progress = {
-        userId,
-        level: 1,
+    if (!userId || userId.length !== 24) {
+      return NextResponse.json({
         xp: 0,
-        streak: 0,
-        completedLessons: [],
-        achievements: ["first_login"]
-      };
+        streak: 1,
+        achievements: ["first_login"],
+        completedPaths: []
+      });
     }
     
-    return NextResponse.json(progress);
+    const client = await clientPromise;
+    const db = client.db('digipico');
+    const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+    
+    if (!user) {
+      return NextResponse.json({
+        xp: 0,
+        streak: 1,
+        achievements: ["first_login"]
+      });
+    }
+    
+    return NextResponse.json({
+      xp: user.xp || 0,
+      streak: user.streak || 1,
+      achievements: user.achievements || []
+    });
   } catch (error) {
     console.error("Profile DB Error:", error);
     // Safe fallback if MongoDB is not connected

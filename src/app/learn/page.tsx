@@ -73,9 +73,14 @@ export default function LearnPage() {
 
   return (
     <main className="p-6 max-w-md mx-auto space-y-6 pb-24 bg-[#080b1a] min-h-screen text-slate-100">
-      <header className="pt-4 pb-2">
-        <h1 className="text-4xl font-black tracking-tight text-white mb-2">Curriculum</h1>
-        <p className="text-blue-300 font-medium text-sm">AI-generated personalized learning path</p>
+      <header className="pt-4 pb-2 flex justify-between items-start">
+        <div>
+          <h1 className="text-4xl font-black tracking-tight text-white mb-2">Curriculum</h1>
+          <p className="text-blue-300 font-medium text-sm">AI-generated personalized learning path</p>
+        </div>
+        <Button onClick={() => window.location.href = '/quiz'} className="bg-purple-600 hover:bg-purple-500 rounded-xl shadow-md">
+          Take Quiz
+        </Button>
       </header>
 
       {/* Topic Tabs */}
@@ -189,7 +194,7 @@ export default function LearnPage() {
                   </Button>
                   
                   <Button 
-                    onClick={() => {
+                    onClick={async () => {
                       const newSteps = [...learningPath.steps];
                       const currentIndex = newSteps.findIndex(s => s.id === step.id);
                       if (currentIndex !== -1) {
@@ -202,6 +207,25 @@ export default function LearnPage() {
                           steps: newSteps,
                           progress: Math.min(100, Math.round(((currentIndex + 1) / newSteps.length) * 100))
                         });
+
+                        // Add XP in DB
+                        try {
+                          const userId = localStorage.getItem("digipico_user_id");
+                          if (userId && userId.length === 24) {
+                            const pRes = await fetch(`/api/profile?userId=${userId}`);
+                            const pData = await pRes.json();
+                            await fetch("/api/user", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                userId,
+                                updates: { xp: (pData.xp || 0) + 150 }
+                              })
+                            });
+                          }
+                        } catch (e) {
+                          console.error("XP add failed", e);
+                        }
                       }
                     }}
                     size="sm" 

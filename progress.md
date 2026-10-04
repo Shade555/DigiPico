@@ -50,7 +50,7 @@
 - [x] Ask Pico
 - [x] Learning paths
 - [x] Quizzes
-- [ ] Hands-on challenges
+- [x] Hands-on challenges
 - [ ] Hackathon discovery
 - [x] Voice interaction
 - [x] Progress tracking
@@ -62,7 +62,7 @@
 
 - [ ] Render deployment
 - [ ] DigitalOcean GPU
-- [ ] Production MongoDB
+- [x] Production MongoDB
 - [ ] Sentry production monitoring
 - [ ] Mobile build
 
@@ -78,8 +78,8 @@
 
 **Overall Progress:** 0%
 
-Core Product: 0%
-AI: 0%
-Partners: 0%
+Core Product: 85%
+AI: 90%
+Partners: 95%
 Mobile: 0%
 Documentation: 10%
