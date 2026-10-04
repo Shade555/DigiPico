@@ -17,14 +17,14 @@ export async function POST(req: Request) {
       ...messages.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content }))
     ];
 
-    const response = await fetch("https://api-inference.huggingface.co/models/google/gemma-2-9b-it/v1/chat/completions", {
+    const response = await fetch("https://api-inference.huggingface.co/models/google/gemma-4-E4B-it/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${hfApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemma-2-9b-it",
+        model: "google/gemma-4-E4B-it",
         messages: formattedMessages,
         max_tokens: 500,
       }),
