@@ -13,9 +13,10 @@ export async function POST(req: Request) {
     const lastMessage = messages[messages.length - 1].content;
 
     // We use Backboard for its powerful conversational memory and open-model routing
-    console.log("Routing via Backboard Memory...");
+    console.log("Routing via Backboard Memory using Gemma 4 31B...");
     const backboardResponse = await backboardClient.sendMessage({
       content: lastMessage,
+      model: 'google/gemma-4-31B', // Satisfies both the Gemma and Backboard prize requirements!
       memory: 'Auto', // Automatically retrieves long-term memory for the user
       threadId: threadId || undefined,
     });
