@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server';
 import { digipicoAgent } from '@/agent/digipico-agent';
-import { BackboardClient } from 'backboard-sdk';
-
-const backboardClient = new BackboardClient({ 
-  apiKey: process.env.BACKBOARD_API_KEY || 'espr_NEEDKMyVRgVD9Ky-TnM5BpO-u8wnUSQGwXF9JWJJUOc' 
-});
 
 export async function POST(req: Request) {
   try {

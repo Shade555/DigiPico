@@ -39,7 +39,7 @@ export function ChatInterface() {
       if (savedThreads) {
         try {
           setTimeout(() => setAllThreads(JSON.parse(savedThreads)), 0);
-        } catch(_e) {}
+        } catch {}
       }
       setTimeout(() => {
         setIsCheckingAuth(false);

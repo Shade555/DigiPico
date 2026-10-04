@@ -11,6 +11,7 @@ export const retrieveMemoryTool = createTool({
     },
     required: ['userId', 'topic'],
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: async ({ context }: any) => {
     // In a real implementation, this queries Backboard / Tiger Data / Mongo Atlas Vector Search
     console.log(`Retrieving memory for user ${context.userId} on topic ${context.topic}`);
@@ -34,6 +35,7 @@ export const saveMemoryTool = createTool({
     },
     required: ['userId', 'fact', 'category'],
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: async ({ context }: any) => {
     // Saves to MongoDB
     console.log(`Saved ${context.category} for user ${context.userId}: ${context.fact}`);

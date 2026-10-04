@@ -11,6 +11,7 @@ export const createLearningPathTool = createTool({
     },
     required: ['topic', 'userLevel'],
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: async ({ context }: any) => {
     console.log(`Generating learning path for ${context.topic} at level: ${context.userLevel}`);
     
@@ -37,6 +38,7 @@ export const generateQuizTool = createTool({
     },
     required: ['topic'],
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: async ({ context }: any) => {
     return {
       quizId: 'quiz_123',

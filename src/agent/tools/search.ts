@@ -10,6 +10,7 @@ export const searchTechTool = createTool({
     },
     required: ['query'],
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: async ({ context }: any) => {
     console.log(`Executing live search for: ${context.query}`);
     const apiKey = process.env.SERPAPI_API_KEY;
@@ -43,6 +44,7 @@ export const searchHackathonsTool = createTool({
     },
     required: ['topic'],
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: async ({ context }: any) => {
     console.log(`Executing live hackathon search for: ${context.topic}`);
     const apiKey = process.env.SERPAPI_API_KEY;
