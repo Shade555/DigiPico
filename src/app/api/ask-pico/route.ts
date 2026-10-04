@@ -17,8 +17,7 @@ export async function POST(req: Request) {
 
     console.log("Routing via Mastra Agent + Backboard Memory...");
     const response = await digipicoAgent.generate(formattedMessages, { 
-      threadId,
-      memory: backboardClient 
+      threadId
     });
 
     let reply = response.text || "Oops, I got confused! Try asking again.";
@@ -28,7 +27,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       content: reply,
-      threadId: response.threadId || threadId
+      threadId: threadId || "new-thread-" + Date.now()
     });
   } catch (error: unknown) {
     console.error("Mastra API Route Error:", error);

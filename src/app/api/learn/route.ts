@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server';
+import { digipicoAgent } from '@/agent/digipico-agent';
 
 export async function POST(req: Request) {
   let topic = "Technology";
   try {
     const body = await req.json();
     topic = body.topic || "Technology";
-    const googleApiKey = process.env.GOOGLE_API_KEY;
-
-    if (!googleApiKey) {
-      throw new Error("Missing GOOGLE_API_KEY");
-    }
 
     const prompt = `You are a senior computer science professor. Create an incredibly comprehensive 8-step learning curriculum for a beginner learning about: "${topic}". 
     You must reply ONLY with a raw JSON object (no markdown).
@@ -23,26 +19,8 @@ export async function POST(req: Request) {
       ]
     }`;
 
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${googleApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gemma-4-31b-it",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 1000,
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`AI API failed: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    let reply = data.choices?.[0]?.message?.content || "";
+    const response = await digipicoAgent.generate([{ role: "user", content: prompt }]);
+    let reply = response.text || "";
     
     // Strip <thought> tags if they exist
     reply = reply.replace(/<thought>[\s\S]*?<\/thought>/gi, "").trim();

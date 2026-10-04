@@ -15,7 +15,7 @@ export function ChatInterface() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [autoSendMsg, setAutoSendMsg] = useState<string | null>(null);
   
-  const [allThreads, setAllThreads] = useState<{ threadId: string, preview: string, messages: Record<string, unknown>[], date: string }[]>([]);
+  const [allThreads, setAllThreads] = useState<{ threadId: string, preview: string, messages: { role: string; content: string }[], date: string }[]>([]);
   const [showThreads, setShowThreads] = useState(false);
   
   useEffect(() => {
@@ -39,7 +39,7 @@ export function ChatInterface() {
       if (savedThreads) {
         try {
           setTimeout(() => setAllThreads(JSON.parse(savedThreads)), 0);
-        } catch(e) {}
+        } catch(_e) {}
       }
       setTimeout(() => {
         setIsCheckingAuth(false);
@@ -272,7 +272,7 @@ export function ChatInterface() {
             disabled={isLoading}
           />
           <Button 
-            onClick={handleSend} 
+            onClick={() => handleSend()} 
             disabled={isLoading || !input.trim()}
             className="rounded-full w-12 h-12 p-0 flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white shadow-md transition-transform active:scale-95 disabled:opacity-50"
           >

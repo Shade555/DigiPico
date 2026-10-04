@@ -10,7 +10,7 @@ export const searchTechTool = createTool({
     },
     required: ['query'],
   },
-  execute: async ({ context }: Record<string, unknown>) => {
+  execute: async ({ context }: any) => {
     console.log(`Executing live search for: ${context.query}`);
     const apiKey = process.env.SERPAPI_API_KEY;
     if (!apiKey) return { results: [{ title: 'SerpApi Key Missing', snippet: 'Configure SERPAPI_API_KEY in .env to enable live search.' }] };
@@ -43,7 +43,7 @@ export const searchHackathonsTool = createTool({
     },
     required: ['topic'],
   },
-  execute: async ({ context }: Record<string, unknown>) => {
+  execute: async ({ context }: any) => {
     console.log(`Executing live hackathon search for: ${context.topic}`);
     const apiKey = process.env.SERPAPI_API_KEY;
     if (!apiKey) return { results: [{ name: 'Key Missing', description: 'Configure SERPAPI_API_KEY' }] };

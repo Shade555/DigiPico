@@ -46,7 +46,7 @@ export default function AuthPage() {
       }
       
       router.push("/discover");
-    } catch (err) {
+    } catch (_err) {
       alert("Authentication failed.");
       setIsLoading(false);
     }
