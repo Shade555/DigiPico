@@ -14,11 +14,14 @@ export function ChatInterface() {
   const [threadId, setThreadId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const router = import("next/navigation").then(mod => mod.useRouter);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   
   useEffect(() => {
     const userId = localStorage.getItem("digipico_user_id");
     if (!userId) {
       window.location.href = "/auth";
+    } else {
+      setIsCheckingAuth(false);
     }
   }, []);
 
@@ -27,6 +30,8 @@ export function ChatInterface() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
+
+  if (isCheckingAuth) return <div className="h-screen bg-[#080b1a]" />; // Prevent UI flash before redirect
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;

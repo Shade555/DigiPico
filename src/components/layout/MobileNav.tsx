@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, BookOpen, Hammer, User } from "lucide-react";
+import { Compass, BookOpen, Hammer, User, MessageCircle } from "lucide-react";
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -10,13 +10,14 @@ export function MobileNav() {
   const navItems = [
     { name: "Discover", href: "/discover", icon: Compass },
     { name: "Learn", href: "/learn", icon: BookOpen },
+    { name: "Chat", href: "/", icon: MessageCircle },
     { name: "Build", href: "/build", icon: Hammer },
-    { name: "Pico", href: "/profile", icon: User },
+    { name: "Profile", href: "/profile", icon: User },
   ];
 
   return (
     <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-[#0a0f24] border-t border-[#1e2753] safe-area-bottom">
-      <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
+      <div className="grid h-full max-w-lg grid-cols-5 mx-auto font-medium">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
