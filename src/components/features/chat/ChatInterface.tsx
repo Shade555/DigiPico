@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PicoMascot } from "@/components/features/pico/PicoMascot";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Loader2, History, Trash2, ArrowLeft } from "lucide-react";
+import { Send, Loader2, History, Trash2, ArrowLeft, Plus } from "lucide-react";
 import { textToSpeech } from "@/lib/audio";
 
 const CUTE_LOADING_MESSAGES = [
@@ -190,7 +190,7 @@ export function ChatInterface() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-slate-500 hover:text-red-400 hover:bg-red-900/20"
+            className="text-slate-500 hover:text-green-400 hover:bg-green-900/20"
             onClick={() => {
               if (confirm("Start a new conversation?")) {
                 localStorage.removeItem("digipico_chat_history");
@@ -201,7 +201,8 @@ export function ChatInterface() {
               }
             }}
           >
-            <Trash2 className="w-4 h-4" />
+            <Plus className="w-4 h-4 mr-1" />
+            New Chat
           </Button>
         </div>
       </div>

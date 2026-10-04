@@ -24,15 +24,25 @@ export default function BuildPage() {
   const [selectedTopic, setSelectedTopic] = useState<string>("");
 
   useEffect(() => {
-    let storedTopics = JSON.parse(localStorage.getItem("digipico_interests") || "[]");
+    let storedTopics: string[] = [];
+    try {
+      const parsed = JSON.parse(localStorage.getItem("digipico_interests") || "[]");
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        storedTopics = parsed;
+      }
+    } catch (e) {}
+    
     if (storedTopics.length === 0) {
-      const legacy = localStorage.getItem("digipico_interest") || "artificial intelligence";
+      const legacy = localStorage.getItem("digipico_interest") || "Artificial Intelligence";
       storedTopics = [legacy];
       localStorage.setItem("digipico_interests", JSON.stringify(storedTopics));
     }
+    
     setTimeout(() => {
       setTopics(storedTopics);
-      setSelectedTopic(storedTopics[0]);
+      if (storedTopics.length > 0) {
+        setSelectedTopic(storedTopics[0]);
+      }
     }, 0);
   }, []);
 
@@ -59,6 +69,28 @@ export default function BuildPage() {
   }, [selectedTopic]);
 
   
+  const handleComplete = async (id: number) => {
+    // Optimistic UI update
+    setChallenges(prev => prev.map(c => 
+      c.id === id ? { ...c, completed: true } : c
+    ));
+    
+    // Add XP and achievement
+    try {
+      const userId = localStorage.getItem("digipico_user_id");
+      if (userId) {
+        await fetch("/api/user", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, xpToAdd: 15, achievements: ["first_build"] })
+        });
+        alert("Challenge completed! +15 XP");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   if (isLoading || challenges.length === 0) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#080b1a]">
@@ -122,7 +154,7 @@ export default function BuildPage() {
 
             {challenge.active && (
               <div className="mt-4">
-                <CodeSandbox defaultCode={challenge.template} />
+                <CodeSandbox defaultCode={challenge.template} onComplete={() => handleComplete(challenge.id)} />
               </div>
             )}
             

@@ -4,13 +4,15 @@ import { useState } from "react";
 import { Play, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function CodeSandbox({ defaultCode = "console.log('Hello World!');" }: { defaultCode?: string }) {
+export function CodeSandbox({ defaultCode = "console.log('Hello World!');", onComplete }: { defaultCode?: string, onComplete?: () => void }) {
   const [code, setCode] = useState(defaultCode);
   const [output, setOutput] = useState<string[]>([]);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const runCode = () => {
     setOutput([]);
     const logs: string[] = [];
+    let hasError = false;
     
     // Capture console.log
     const originalConsoleLog = console.log;
@@ -20,15 +22,24 @@ export function CodeSandbox({ defaultCode = "console.log('Hello World!');" }: { 
 
     try {
       const executeCode = new Function(code);
-      executeCode();
+      const result = executeCode();
+      if (result !== undefined) {
+        logs.push(`Returned: ${typeof result === 'object' ? JSON.stringify(result) : String(result)}`);
+      }
       if (logs.length === 0) logs.push("Execution completed with no output.");
     } catch (e: unknown) {
+      hasError = true;
       logs.push(`Error: ${e instanceof Error ? e.message : String(e)}`);
     }
 
     // Restore console.log
     console.log = originalConsoleLog;
     setOutput(logs);
+
+    if (!hasError) {
+      setIsSuccess(true);
+      if (onComplete) onComplete();
+    }
   };
 
   return (

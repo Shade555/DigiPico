@@ -30,16 +30,25 @@ export default function LearnPage() {
   const [selectedTopic, setSelectedTopic] = useState<string>("");
 
   useEffect(() => {
-    // Load topics from local storage
-    let storedTopics = JSON.parse(localStorage.getItem("digipico_interests") || "[]");
+    let storedTopics: string[] = [];
+    try {
+      const parsed = JSON.parse(localStorage.getItem("digipico_interests") || "[]");
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        storedTopics = parsed;
+      }
+    } catch (e) {}
+    
     if (storedTopics.length === 0) {
       const legacy = localStorage.getItem("digipico_interest") || "Introduction to AI";
       storedTopics = [legacy];
       localStorage.setItem("digipico_interests", JSON.stringify(storedTopics));
     }
+    
     setTimeout(() => {
       setTopics(storedTopics);
-      setSelectedTopic(storedTopics[0]);
+      if (storedTopics.length > 0) {
+        setSelectedTopic(storedTopics[0]);
+      }
     }, 0);
   }, []);
 
