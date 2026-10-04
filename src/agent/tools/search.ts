@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core';
+import { createTool } from '@mastra/core/tools';
 
 export const searchTechTool = createTool({
   id: 'searchTech',
@@ -32,7 +32,7 @@ export const searchHackathonsTool = createTool({
     },
     required: ['topic'],
   },
-  execute: async ({ context }) => {
+  execute: async ({ context: _context }) => {
     return {
       results: [
         { name: 'DEV Weekend Challenge', description: 'Build for a friend hackathon.' }

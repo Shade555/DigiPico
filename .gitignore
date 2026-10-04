@@ -42,3 +42,6 @@ atlas-credentials.env
 next-env.d.ts
 
 atlas-credentials.env
+
+# Sentry Config File
+.env.sentry-build-plugin

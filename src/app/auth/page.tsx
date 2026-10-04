@@ -29,7 +29,7 @@ export default function AuthPage() {
         localStorage.setItem("digipico_interest", interest);
       }
       
-      router.push("/");
+      router.push("/discover");
     }, 1500);
   };
 

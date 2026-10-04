@@ -5,8 +5,16 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Sparkles, Terminal, ArrowRight, Loader2 } from "lucide-react";
 
+interface Discovery {
+  title: string;
+  description: string;
+  type: string;
+  time: string;
+  link?: string;
+}
+
 export default function DiscoverPage() {
-  const [discoveries, setDiscoveries] = useState<any[]>([]);
+  const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

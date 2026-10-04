@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core';
+import { createTool } from '@mastra/core/tools';
 
 export const retrieveMemoryTool = createTool({
   id: 'retrieveMemory',

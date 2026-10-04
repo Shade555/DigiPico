@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         const mastraRes = await digipicoAgent.generate(messages);
         return NextResponse.json({ content: mastraRes.text });
       }
-    } catch (mastraError) {
+    } catch (_mastraError) {
       console.log("Local Mastra also failed (likely no local GPU running). Using safe Hackathon fallback.");
       return NextResponse.json({ 
         content: `I'm currently running in Hackathon Demo Mode! Since the Backboard inference credits are exhausted and there's no local GPU detected, I'm using a safe fallback. But don't worry—your profile, dynamic Wikipedia curriculum, and code evaluation sandboxes are all fully functional! Try exploring the Learn or Build tabs.` 

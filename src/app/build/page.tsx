@@ -5,8 +5,18 @@ import { motion } from "framer-motion";
 import { Play, CheckCircle2, ChevronRight, Terminal, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+interface Challenge {
+  id: number;
+  title: string;
+  description: string;
+  difficulty: string;
+  completed: boolean;
+  active: boolean;
+  template: string;
+}
+
 export default function BuildPage() {
-  const [challenges, setChallenges] = useState<any[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [codeOutputs, setCodeOutputs] = useState<Record<number, string>>({});
 
@@ -20,7 +30,9 @@ export default function BuildPage() {
       storedTopics = [legacy];
       localStorage.setItem("digipico_interests", JSON.stringify(storedTopics));
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTopics(storedTopics);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedTopic(storedTopics[0]);
   }, []);
 
@@ -54,8 +66,9 @@ export default function BuildPage() {
       const fn = new AsyncFunction(template);
       const result = await fn();
       setCodeOutputs(prev => ({ ...prev, [id]: String(result) }));
-    } catch (e: any) {
-      setCodeOutputs(prev => ({ ...prev, [id]: `Error: ${e.message}` }));
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      setCodeOutputs(prev => ({ ...prev, [id]: `Error: ${errorMessage}` }));
     }
   };
 

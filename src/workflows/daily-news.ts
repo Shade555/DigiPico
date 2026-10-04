@@ -1,7 +1,8 @@
-import { proxyActivities, workflowInfo } from '@temporalio/workflow';
+import { proxyActivities } from '@temporalio/workflow';
 // import type { NewsActivities } from '../activities/news';
 
 // Mocking the activities proxy for the hackathon
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const { fetchDailyNews, sendPushNotification } = proxyActivities<any>({
   startToCloseTimeout: '1 minute',
 });

@@ -37,8 +37,9 @@ export async function POST(req: Request) {
     ];
 
     return NextResponse.json(challenges);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Build API Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to fetch challenges" }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch challenges";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

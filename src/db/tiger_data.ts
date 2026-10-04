@@ -5,12 +5,14 @@
 // import { Pool } from 'pg';
 // const pool = new Pool({ connectionString: process.env.TIGER_DATA_URI });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function searchEducationalResources(query: string, embedding: number[]) {
   console.log("Running Hybrid Search on Tiger Data (pgvector)...");
   
   // This SQL query demonstrates hybrid search:
   // 1. Keyword matching using tsvector/tsquery
   // 2. Semantic vector search using pgvector (<-> operator)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sql = `
     WITH keyword_search AS (
       SELECT id, title, content, 1.0 AS keyword_score
@@ -41,8 +43,10 @@ export async function searchEducationalResources(query: string, embedding: numbe
   ];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function storeResourceEmbedding(title: string, content: string, embedding: number[]) {
   // Store embeddings with pgvector
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sql = `
     INSERT INTO educational_resources (title, content, embedding)
     VALUES ($1, $2, $3)

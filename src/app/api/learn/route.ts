@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
+  let topic = "Technology";
   try {
-    const { topic } = await req.json();
+    const body = await req.json();
+    topic = body.topic || "Technology";
     
     // We dynamically generate the curriculum using real Wikipedia data!
     // This provides 100% real personalized content without needing expensive API credits.
@@ -72,11 +74,11 @@ export async function POST(req: Request) {
       steps 
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Learn API Error:", error);
     // Fallback to a generic tech curriculum so the UI never breaks during the demo!
     return NextResponse.json({
-      topic: topic || "Technology",
+      topic: topic,
       progress: 40,
       steps: [
         { id: 1, title: "The Basics", description: `An introduction to the core concepts of ${topic}.`, type: "concept", status: "completed" },

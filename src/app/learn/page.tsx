@@ -2,11 +2,26 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, ArrowRight, Loader2 } from "lucide-react";
+import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+interface Step {
+  id: number;
+  title: string;
+  description?: string;
+  type: string;
+  status: string;
+}
+
+interface LearningPath {
+  topic: string;
+  progress: number;
+  steps: Step[];
+  error?: string;
+}
+
 export default function LearnPage() {
-  const [learningPath, setLearningPath] = useState<any>(null);
+  const [learningPath, setLearningPath] = useState<LearningPath | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const [topics, setTopics] = useState<string[]>([]);
@@ -20,7 +35,9 @@ export default function LearnPage() {
       storedTopics = [legacy];
       localStorage.setItem("digipico_interests", JSON.stringify(storedTopics));
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTopics(storedTopics);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedTopic(storedTopics[0]);
   }, []);
 
@@ -82,7 +99,7 @@ export default function LearnPage() {
 
       {learningPath.error ? (
         <div className="p-6 bg-red-900/20 rounded-2xl border border-red-500/30 text-red-200 text-center mt-10">
-          <p className="font-bold mb-2">Couldn't generate curriculum</p>
+          <p className="font-bold mb-2">Could not generate curriculum</p>
           <p className="text-sm opacity-80">{learningPath.error}. Try signing up with a more common tech topic!</p>
         </div>
       ) : (
@@ -117,7 +134,7 @@ export default function LearnPage() {
       <div className="space-y-3 pt-6 relative">
         <div className="absolute left-[1.35rem] top-10 bottom-10 w-0.5 bg-gradient-to-b from-blue-500/50 via-[#1e2753] to-transparent z-0" />
         
-        {learningPath.steps.map((step: any, i: number) => (
+        {learningPath.steps.map((step: Step, i: number) => (
           <motion.div 
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}

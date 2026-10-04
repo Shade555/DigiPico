@@ -13,14 +13,15 @@ export function ChatInterface() {
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const router = import("next/navigation").then(mod => mod.useRouter);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   
   useEffect(() => {
     const userId = localStorage.getItem("digipico_user_id");
     if (!userId) {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.href = "/auth";
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsCheckingAuth(false);
     }
   }, []);
@@ -89,7 +90,7 @@ export function ChatInterface() {
               className="flex flex-col items-center justify-center h-full text-center text-slate-400 mt-10 space-y-4"
             >
               <PicoMascot size="lg" mood="curious" />
-              <p className="max-w-[200px] text-sm">Hi! I'm Pico. Ask me anything about technology, and I'll explain it simply!</p>
+              <p className="max-w-[200px] text-sm">Hi! I&apos;m Pico. Ask me anything about technology, and I&apos;ll explain it simply!</p>
             </motion.div>
           )}
 

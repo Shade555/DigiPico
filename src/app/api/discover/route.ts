@@ -32,7 +32,7 @@ export async function GET(req: Request) {
     const data = await res.json();
     
     // Transform SerpApi results to our Discover card format
-    const news = data.news_results?.slice(0, 5).map((item: any) => ({
+    const news = data.news_results?.slice(0, 5).map((item: { title: string; snippet?: string; date?: string; link?: string }) => ({
       title: item.title,
       description: item.snippet || "Click to learn more about this recent technology development.",
       type: item.title.toLowerCase().includes('hackathon') ? "Event" : "Tech News",
