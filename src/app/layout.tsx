@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body className={`${inter.className} bg-[#080b1a] text-slate-100 min-h-screen pb-16`}>
         {children}
         <MobileNav />

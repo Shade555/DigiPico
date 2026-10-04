@@ -39,58 +39,79 @@ export default function LearnPage() {
   return (
     <main className="p-6 max-w-md mx-auto space-y-6 pb-24 bg-[#080b1a] min-h-screen text-slate-100">
       <header className="pt-4 pb-2">
-        <h1 className="text-3xl font-black tracking-tight text-slate-100">Learn</h1>
-        <p className="text-slate-400 font-medium mt-1">Your personalized tech curriculum.</p>
+        <h1 className="text-4xl font-black tracking-tight text-white mb-2">Curriculum</h1>
+        <p className="text-blue-300 font-medium text-sm">AI-generated personalized learning path</p>
       </header>
 
       {/* Progress Card */}
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#0a0f24] text-slate-100 rounded-3xl p-6 shadow-md border border-[#1e2753]"
+        className="relative overflow-hidden bg-gradient-to-br from-[#131b3b] to-[#0a0f24] text-white rounded-[2rem] p-6 shadow-xl border border-[#1e2753]"
       >
-        <h2 className="text-lg font-bold mb-4 opacity-90">Current Path: {learningPath.topic}</h2>
-        <div className="w-full bg-[#131b3b] rounded-full h-3 overflow-hidden mb-2 border border-[#1e2753]">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+        <h2 className="text-xl font-black mb-1 z-10 relative">{learningPath.topic}</h2>
+        <p className="text-slate-400 text-sm mb-6 z-10 relative">Master the fundamentals</p>
+        
+        <div className="w-full bg-[#080b1a] rounded-full h-4 overflow-hidden mb-2 border border-[#1e2753] p-0.5 z-10 relative">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${learningPath.progress}%` }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="bg-blue-500 h-full shadow-[0_0_10px_rgba(59,130,246,0.8)]"
-          />
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="bg-gradient-to-r from-blue-600 to-blue-400 h-full rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)] relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-white/20 w-1/2 skew-x-12 animate-[shimmer_2s_infinite]" />
+          </motion.div>
         </div>
-        <p className="text-xs text-blue-400 font-bold tracking-wider text-right">{learningPath.progress}% Complete</p>
+        <div className="flex justify-between items-center z-10 relative">
+          <span className="text-xs font-bold text-slate-500">PROGRESS</span>
+          <span className="text-sm text-blue-300 font-black tracking-wider">{learningPath.progress}%</span>
+        </div>
       </motion.div>
 
       {/* Path Steps */}
-      <div className="space-y-4 pt-4 relative">
-        <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-[#1e2753] z-0" />
+      <div className="space-y-3 pt-6 relative">
+        <div className="absolute left-[1.35rem] top-10 bottom-10 w-0.5 bg-gradient-to-b from-blue-500/50 via-[#1e2753] to-transparent z-0" />
         
-        {learningPath.steps.map((step, i) => (
+        {learningPath.steps.map((step: any, i: number) => (
           <motion.div 
-            initial={{ opacity: 0, x: -10 }}
+            initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1 }}
+            transition={{ delay: i * 0.15 }}
             key={step.id} 
-            className={`flex items-center gap-4 relative z-10 ${step.status === 'locked' ? 'opacity-40' : ''}`}
+            className={`flex items-start gap-5 relative z-10 group ${step.status === 'locked' ? 'opacity-40' : ''}`}
           >
-            <div className="bg-[#080b1a] py-2">
+            <div className="bg-[#080b1a] py-2 mt-2">
               {step.status === 'completed' ? (
-                <CheckCircle2 className="w-8 h-8 text-green-500 bg-[#080b1a] rounded-full" />
+                <div className="w-7 h-7 rounded-full bg-blue-600/20 border border-blue-500 flex items-center justify-center text-blue-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
               ) : step.status === 'current' ? (
-                <div className="w-8 h-8 rounded-full border-4 border-blue-500 bg-[#080b1a] flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                  <div className="w-2.5 h-2.5 bg-blue-400 rounded-full" />
+                <div className="w-7 h-7 rounded-full border-2 border-white bg-[#0a0f24] flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                  <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse" />
                 </div>
               ) : (
-                <Circle className="w-8 h-8 text-[#1e2753] bg-[#080b1a] rounded-full" />
+                <div className="w-7 h-7 rounded-full border-2 border-[#1e2753] bg-[#0a0f24] flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-[#1e2753] rounded-full" />
+                </div>
               )}
             </div>
             
-            <div className={`flex-1 p-4 rounded-2xl border ${step.status === 'current' ? 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)] bg-[#0a0f24]' : 'border-[#1e2753] bg-[#0a0f24]'}`}>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{step.type}</span>
-              <h3 className={`font-bold ${step.status === 'current' ? 'text-blue-400' : 'text-slate-300'}`}>{step.title}</h3>
+            <div className={`flex-1 p-5 rounded-[1.5rem] border transition-all ${
+              step.status === 'current' 
+                ? 'border-slate-600 shadow-[0_0_20px_rgba(255,255,255,0.05)] bg-gradient-to-br from-[#131b3b] to-[#0a0f24]' 
+                : 'border-[#1e2753] bg-[#0a0f24]/50 group-hover:bg-[#0a0f24]'
+            }`}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm ${
+                  step.status === 'current' ? 'bg-blue-600 text-white' : 'bg-[#1e2753] text-slate-400'
+                }`}>{step.type}</span>
+              </div>
+              <h3 className={`font-bold text-lg leading-tight ${step.status === 'current' ? 'text-white' : 'text-slate-300'}`}>{step.title}</h3>
+              
               {step.status === 'current' && (
-                <Button size="sm" className="w-full mt-3 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-white">
-                  Continue Lesson <ArrowRight className="w-4 h-4 ml-1" />
+                <Button size="sm" className="w-full mt-4 rounded-xl bg-white text-black hover:bg-slate-200 font-bold transition-transform active:scale-95 shadow-md">
+                  Start Lesson <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
               )}
             </div>
