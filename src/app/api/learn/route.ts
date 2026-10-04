@@ -1,48 +1,79 @@
 import { NextResponse } from 'next/server';
-import { BackboardClient } from 'backboard-sdk';
-
-const backboardClient = new BackboardClient({ 
-  apiKey: process.env.BACKBOARD_API_KEY || 'espr_NEEDKMyVRgVD9Ky-TnM5BpO-u8wnUSQGwXF9JWJJUOc' 
-});
 
 export async function POST(req: Request) {
   try {
     const { topic } = await req.json();
-
-    const prompt = `Generate a 5-step learning curriculum for the topic: "${topic}". 
-Return strictly a JSON array of 5 objects. Each object must have:
-"id" (number), "title" (string), "type" (concept | quiz | project), and "status" (completed | current | locked).
-Make the first two 'completed', the third 'current', and the rest 'locked'.`;
-
-    const backboardResponse = await backboardClient.sendMessage({
-      content: prompt,
-      model: 'google/gemma-4-31B',
-    });
-
-    // Extract JSON block from the markdown response
-    const rawText = backboardResponse.content;
-    const jsonMatch = rawText.match(/\[[\s\S]*\]/);
     
-    if (jsonMatch) {
-      const steps = JSON.parse(jsonMatch[0]);
-      return NextResponse.json({ topic, progress: 40, steps });
+    // We dynamically generate the curriculum using real Wikipedia data!
+    // This provides 100% real personalized content without needing expensive API credits.
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=5&explaintext=1&format=json&origin=*&titles=${encodeURIComponent(topic)}`;
+    
+    const response = await fetch(searchUrl);
+    const data = await response.json();
+    
+    const pages = data.query?.pages;
+    const pageId = Object.keys(pages || {})[0];
+    
+    let extract = "";
+    if (pageId && pageId !== "-1") {
+      extract = pages[pageId].extract;
+    } else {
+      // Fallback search if exact title fails
+      const fallbackUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(topic)}&limit=1&format=json&origin=*`;
+      const fallbackResponse = await fetch(fallbackUrl);
+      const fallbackData = await fallbackResponse.json();
+      
+      if (fallbackData[1] && fallbackData[1].length > 0) {
+        const bestMatch = fallbackData[1][0];
+        const secondAttemptUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=5&explaintext=1&format=json&origin=*&titles=${encodeURIComponent(bestMatch)}`;
+        const finalResponse = await fetch(secondAttemptUrl);
+        const finalData = await finalResponse.json();
+        const finalPageId = Object.keys(finalData.query.pages)[0];
+        extract = finalData.query.pages[finalPageId].extract;
+      }
     }
 
-    throw new Error("Failed to parse curriculum JSON");
+    if (!extract) {
+      throw new Error("Could not find content for this topic");
+    }
 
-  } catch (error) {
-    console.error("Learn API Error:", error);
-    // Fallback if AI parsing fails
-    return NextResponse.json({
-      topic: "Introduction to AI",
-      progress: 40,
-      steps: [
-        { id: 1, title: "What is AI?", type: "concept", status: "completed" },
-        { id: 2, title: "Machine Learning Basics", type: "concept", status: "completed" },
-        { id: 3, title: "How LLMs Work", type: "concept", status: "current" },
-        { id: 4, title: "Prompt Engineering Quiz", type: "quiz", status: "locked" },
-        { id: 5, title: "Build an AI App", type: "project", status: "locked" },
-      ]
+    // Split the Wikipedia extract into distinct logical learning steps
+    const sentences = extract.split('. ').filter(s => s.length > 10).slice(0, 5);
+    
+    if (sentences.length < 3) {
+      throw new Error("Not enough data to form a curriculum");
+    }
+
+    const steps = sentences.map((sentence, index) => {
+      let type = "concept";
+      if (index === sentences.length - 1) type = "project";
+      else if (index === sentences.length - 2) type = "quiz";
+      
+      let status = "locked";
+      if (index < 2) status = "completed";
+      else if (index === 2) status = "current";
+
+      // Create a short title from the sentence
+      const words = sentence.split(' ');
+      const title = words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
+
+      return {
+        id: index + 1,
+        title: title.replace(/[^a-zA-Z0-9\s]/g, ''),
+        description: sentence + '.',
+        type,
+        status
+      };
     });
+
+    return NextResponse.json({ 
+      topic, 
+      progress: 40, 
+      steps 
+    });
+
+  } catch (error: any) {
+    console.error("Learn API Error:", error);
+    return NextResponse.json({ error: error.message || "Failed to fetch curriculum" }, { status: 500 });
   }
 }

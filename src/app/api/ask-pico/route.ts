@@ -34,10 +34,16 @@ export async function POST(req: Request) {
     
     // Fallback to Mastra Agent if Backboard fails or hits a rate limit
     console.log("Falling back to local Mastra agent...");
-    const { messages } = await req.json().catch(() => ({ messages: [] }));
-    if (messages.length > 0) {
-      const mastraRes = await digipicoAgent.generate(messages);
-      return NextResponse.json({ content: mastraRes.text });
+    try {
+      if (messages && messages.length > 0) {
+        const mastraRes = await digipicoAgent.generate(messages);
+        return NextResponse.json({ content: mastraRes.text });
+      }
+    } catch (mastraError) {
+      console.log("Local Mastra also failed (likely no local GPU running). Using safe Hackathon fallback.");
+      return NextResponse.json({ 
+        content: `I'm currently running in Hackathon Demo Mode! Since the Backboard inference credits are exhausted and there's no local GPU detected, I'm using a safe fallback. But don't worry—your profile, dynamic Wikipedia curriculum, and code evaluation sandboxes are all fully functional! Try exploring the Learn or Build tabs.` 
+      });
     }
     
     return NextResponse.json(

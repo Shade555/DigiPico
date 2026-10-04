@@ -110,6 +110,11 @@ export default function LearnPage() {
                 }`}>{step.type}</span>
               </div>
               <h3 className={`font-bold text-lg leading-tight ${step.status === 'current' ? 'text-white' : 'text-slate-300'}`}>{step.title}</h3>
+              {step.description && (
+                <p className={`text-xs mt-2 leading-relaxed ${step.status === 'current' ? 'text-slate-300' : 'text-slate-500'}`}>
+                  {step.description}
+                </p>
+              )}
               
               {step.status === 'current' && (
                 <Button size="sm" className="w-full mt-4 rounded-xl bg-white text-black hover:bg-slate-200 font-bold transition-transform active:scale-95 shadow-md">
