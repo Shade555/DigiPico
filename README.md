@@ -1,58 +1,64 @@
-# DigiPico 🐣
+<div align="center">
+  <img src="public/cover.jpg" alt="DigiPico Cover" width="100%" style="border-radius: 12px; margin-bottom: 20px;" />
 
-A friendly, AI-powered technology companion built for the Hacktoberfest 2026 "Build for a Friend" challenge.
+  # 🐧 DigiPico
 
-## 🚀 Quick Local Setup
+  **A gamified, mobile-first AI learning companion designed to cure tech intimidation.**
+  
+  [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+  [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com/)
+  [![Gemma 4](https://img.shields.io/badge/AI-Gemma_4-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+  
+  <br />
+</div>
 
-### 1. Install Dependencies
-```bash
-npm install
-```
+## 📖 Overview
 
-### 2. Environment Variables
-Copy `.env.example` to `.env` and fill in your keys:
-```bash
-cp .env.example .env
-```
-*(You will need your MongoDB Atlas URI, ElevenLabs API Key, and your local/remote Gemma 4 endpoint).*
+**DigiPico** was built for the [Hacktoberfest Weekend Challenge: Build for a Friend](https://dev.to/challenges/hacktoberfest-weekend-2026-10-01). 
 
-### 3. Run Temporal (Free Open-Source Cluster)
-To execute the durable push notification cron workflows without paying for Temporal Cloud, self-host the open-source Temporal cluster locally using Docker:
-```bash
-git clone https://github.com/temporalio/docker-compose.git
-cd docker-compose
-docker-compose up
-```
+The goal? To help a non-technical friend fall in love with technology. Traditional tutorials feel like reading a dry textbook, and code editors are cold and unforgiving. DigiPico solves this by disguising tech education as a welcoming, interactive mobile game. 
 
-### 4. Run the App
-```bash
-npm run dev
-```
-Open `http://localhost:3000` to chat with Pico!
+Guided by **Pico**—an empathetic, open-weights AI penguin tutor—users can explore complex computer science concepts through bite-sized paths, test their knowledge with dynamic quizzes, and write real code in a safe JavaScript sandbox to earn XP and unlock achievements!
 
 ---
 
-## 🌍 Production Deployment Guide
+## ✨ Key Features
 
-As per our architecture strategy for the Hacktoberfest partner requirements, we split the deployment into two optimized environments:
-
-### 1. DigitalOcean (Frontend App Hosting)
-We use DigitalOcean App Platform (or a basic droplet) to serve the Next.js static assets and UI.
-- **How to deploy:**
-  1. Go to the DigitalOcean dashboard -> Apps -> Create App.
-  2. Connect this GitHub repository.
-  3. Set the build command to `npm run build` and output directory to `.next`.
-  4. (For Capacitor mobile builds, you can sync the `.next` out folder and compile via Android Studio/Xcode).
-
-### 2. Render (AI Runtime / Mastra Backend)
-We use Render to host the heavy Node.js runtime that executes the Mastra Agent, connects to the GPU inference endpoints, handles the TabPFN Python service, and runs the Temporal workflows.
-- **How to deploy:**
-  1. Simply connect this repository to Render.
-  2. The provided `render.yaml` file (Infrastructure as Code) will automatically configure a Node environment, run `npm install`, and start the backend service!
+- 🐧 **Adorable AI Persona:** Powered by **Gemma 4**, Pico is explicitly prompted to be warm, non-judgmental, and encouraging.
+- 🎮 **Deep Gamification:** Every action (completing a lesson, passing a quiz, running code without errors) awards XP. Track your login streaks and unlock database-backed achievements.
+- 🧩 **Dynamic Learning Paths:** The AI generates custom, structured JSON curriculums based entirely on the user's personal interests (e.g., "Robotics", "React", "AI").
+- 💻 **Interactive JS Sandbox:** An integrated code editor allows users to execute real JavaScript directly in the browser. The AI dynamically generates custom coding challenges for them to solve.
+- 📱 **Mobile-First & Capacitor Ready:** The UI is meticulously crafted for smartphone screens and is fully integrated with **Capacitor** to be bundled as a native iOS/Android app.
 
 ---
 
-### 🎙️ ElevenLabs Voice Setup
-1. Go to [elevenlabs.io](https://elevenlabs.io) and create a free account.
-2. Click your profile icon -> **Profile + API Key**.
-3. Copy the **API Key** into your `.env` as `ELEVENLABS_API_KEY`.
+## 🛠️ The Tech Stack (Partner Integrations)
+
+This project heavily utilizes specialized partner technologies to achieve a complex architecture in a single weekend:
+
+* **[Mastra](https://mastra.ai/):** The open-source agent framework orchestrating the AI logic, tool calling, and structured JSON generation.
+* **[Gemma 4](https://ai.google.dev/):** The open-weights LLM (`gemma-4-26b-a4b-it`) powering Pico's brain and preventing rigid corporate RLHF from ruining the fun.
+* **[MongoDB Atlas](https://www.mongodb.com/):** The primary database handling auth, gamification states, and curriculum caching.
+* **[Backboard](https://backboard.com/):** Effortlessly persists the agent's memory and chat threads so Pico always remembers the user.
+* **[SerpApi](https://serpapi.com/):** A custom Mastra tool that allows Pico to search the live web for beginner-friendly tech news and hackathons.
+* **[TabPFN](https://github.com/automl/TabPFN):** Tabular machine learning used to predict a user's "Tech Readiness Score" based on their XP and streak.
+* **[ElevenLabs](https://elevenlabs.io/):** Text-to-Speech API giving Pico a cute, expressive voice in the chat.
+* **[Sentry](https://sentry.io/):** Full-stack error tracking and agent tracing to ensure a crash-free experience.
+* **[Render](https://render.com/):** The monolithic Next.js application is seamlessly deployed as a Web Service using a declarative `render.yaml` blueprint.
+
+---
+
+## 🚀 Installation & Setup
+
+Want to run DigiPico on your own machine or deploy it to the cloud? 
+
+It's incredibly easy! All instructions for environment variables, local development, and Render deployment have been moved to their own dedicated guide.
+
+👉 **[Read the full SETUP.md Guide here](./SETUP.md)**
+
+---
+
+<div align="center">
+  <i>Built with ❤️ for Hacktoberfest 2026</i>
+</div>
