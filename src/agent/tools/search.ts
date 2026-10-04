@@ -10,7 +10,7 @@ export const searchTechTool = createTool({
     },
     required: ['query'],
   },
-  execute: async ({ context }: any) => {
+  execute: async ({ context }: Record<string, unknown>) => {
     // In a real implementation, this calls SerpApi
     console.log(`Executing searchTech for: ${context.query}`);
     return {
@@ -32,7 +32,7 @@ export const searchHackathonsTool = createTool({
     },
     required: ['topic'],
   },
-  execute: async ({ context }: any) => {
+  execute: async () => {
     return {
       results: [
         { name: 'DEV Weekend Challenge', description: 'Build for a friend hackathon.' }
