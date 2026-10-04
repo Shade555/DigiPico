@@ -161,8 +161,16 @@ export default function ProfilePage() {
               }
               current.push(input.value.trim());
               localStorage.setItem("digipico_interests", JSON.stringify([...new Set(current)]));
+              
+              // Trigger background async generation!
+              fetch("/api/learn", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ topic: input.value.trim() })
+              }).catch(console.error);
+
               input.value = "";
-              alert("New Learning Path Added! Check the Learn tab.");
+              alert("New Learning Path Added! Pico is building it in the background.");
             }
           }} className="bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md">
             Add
