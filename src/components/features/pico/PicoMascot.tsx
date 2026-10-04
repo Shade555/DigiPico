@@ -18,7 +18,7 @@ export function PicoMascot({ mood = "happy", size = "md", className = "" }: Pico
   const s = sizeMap[size];
 
   // Bird animation variants
-  const floatVariants = {
+  const floatVariants: any = {
     animate: {
       y: [0, -10, 0],
       transition: {
@@ -29,7 +29,7 @@ export function PicoMascot({ mood = "happy", size = "md", className = "" }: Pico
     },
   };
 
-  const wingVariants = {
+  const wingVariants: any = {
     animate: {
       rotate: [0, -20, 20, -20, 0],
       transition: {
