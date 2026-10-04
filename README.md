@@ -1,6 +1,4 @@
 <div align="center">
-  <img src="public/cover.jpg" alt="DigiPico Cover" width="100%" style="border-radius: 12px; margin-bottom: 20px;" />
-
   # 🐧 DigiPico
 
   **A gamified, mobile-first AI learning companion designed to cure tech intimidation.**
@@ -12,6 +10,38 @@
   
   <br />
 </div>
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart TD
+    User([📱 User / Capacitor Mobile]) --> |HTTPS| Render
+    
+    subgraph Render [Render (Next.js Monolith)]
+        UI[Frontend UI]
+        API[Backend API Routes]
+        UI <--> API
+    end
+    
+    subgraph Brain [Mastra AI Orchestration]
+        Mastra[Mastra Framework]
+        Tools[Agent Tools]
+        Mastra --- Tools
+    end
+    
+    API <-->|Prompt/Response| Mastra
+    
+    Tools -->|Live Web Search| SerpApi[🌐 SerpApi]
+    Tools -->|Chat Memory| Backboard[🧠 Backboard]
+    
+    Mastra <-->|Open-Weights LLM| Gemma[🤖 Gemma 4]
+    
+    API <-->|Text-to-Speech| ElevenLabs[🗣️ ElevenLabs]
+    API <-->|Auth & Gamification| Mongo[(🍃 MongoDB Atlas)]
+    API <-->|Tech Readiness Prediction| TabPFN[📊 TabPFN]
+    
+    Render -->|Error & Agent Tracing| Sentry[👁️ Sentry]
+```
 
 ## 📖 Overview
 
@@ -45,6 +75,7 @@ This project heavily utilizes specialized partner technologies to achieve a comp
 * **[TabPFN](https://github.com/automl/TabPFN):** Tabular machine learning used to predict a user's "Tech Readiness Score" based on their XP and streak.
 * **[ElevenLabs](https://elevenlabs.io/):** Text-to-Speech API giving Pico a cute, expressive voice in the chat.
 * **[Sentry](https://sentry.io/):** Full-stack error tracking and agent tracing to ensure a crash-free experience.
+* **[GitHub Copilot](https://github.com/features/copilot):** Accelerated the development of the entire UI and backend architecture through AI pair programming.
 * **[Render](https://render.com/):** The monolithic Next.js application is seamlessly deployed as a Web Service using a declarative `render.yaml` blueprint.
 
 ---
