@@ -54,8 +54,7 @@ app.post("/api/auth", async (req, res) => {
       if (!user) return res.status(401).json({ error: "Invalid credentials" });
       return res.json({ success: true, userId: user._id });
     }
-  } catch (e: unknown) {
-    res.status(500).json({ error: e instanceof Error ? e.message : "Unknown" });
+  } catch {({ error: e instanceof Error ? e.message : "Unknown" });
   }
 });
 
@@ -67,8 +66,7 @@ app.get("/api/user", async (req, res) => {
     const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
     if (!user) return res.status(404).json({ error: "User not found" });
     return res.json(user);
-  } catch (e: unknown) {
-    res.status(500).json({ error: e instanceof Error ? e.message : "Unknown" });
+  } catch {({ error: e instanceof Error ? e.message : "Unknown" });
   }
 });
 
@@ -90,8 +88,7 @@ app.post("/api/user", async (req, res) => {
     }
     await db.collection("users").updateOne({ _id: new ObjectId(userId) }, dbUpdates);
     return res.json({ success: true });
-  } catch (e: unknown) {
-    res.status(500).json({ error: e instanceof Error ? e.message : "Unknown" });
+  } catch {({ error: e instanceof Error ? e.message : "Unknown" });
   }
 });
 
@@ -102,8 +99,7 @@ app.delete("/api/user", async (req, res) => {
     if (!userId) return res.status(400).json({ error: "Missing userId" });
     await db.collection("users").deleteOne({ _id: new ObjectId(userId) });
     return res.json({ success: true });
-  } catch (e: unknown) {
-    res.status(500).json({ error: e instanceof Error ? e.message : "Unknown" });
+  } catch {({ error: e instanceof Error ? e.message : "Unknown" });
   }
 });
 
@@ -117,8 +113,7 @@ app.get("/api/profile", async (req, res) => {
     const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
     if (!user) return res.json({ xp: 0, streak: 1, achievements: ["first_login"] });
     return res.json({ xp: user.xp || 0, streak: user.streak || 1, achievements: user.achievements || [] });
-  } catch (e: unknown) {
-    res.status(500).json({ error: e instanceof Error ? e.message : "Unknown" });
+  } catch {({ error: e instanceof Error ? e.message : "Unknown" });
   }
 });
 
@@ -142,13 +137,12 @@ Reply ONLY with a raw JSON object (no markdown) matching this structure:
   ]
 }`;
     const response = await picoAgent.generate([{ role: "user", content: prompt }]);
-    let reply = stripThought(response.text || "");
+    const reply = stripThought(response.text || "");
     const jsonStr = reply.substring(reply.indexOf("{"), reply.lastIndexOf("}") + 1);
     const curriculum = JSON.parse(jsonStr);
     await curriculums.insertOne({ topic: normalizedTopic, data: curriculum });
     return res.json(curriculum);
-  } catch (e: unknown) {
-    res.status(500).json({ error: e instanceof Error ? e.message : "Failed" });
+  } catch {({ error: e instanceof Error ? e.message : "Failed" });
   }
 });
 
@@ -165,11 +159,10 @@ Reply ONLY with a raw JSON object (no markdown):
   ]
 }`;
     const response = await picoAgent.generate([{ role: "user", content: prompt }]);
-    let reply = stripThought(response.text || "");
+    const reply = stripThought(response.text || "");
     const jsonStr = reply.substring(reply.indexOf("{"), reply.lastIndexOf("}") + 1);
     return res.json(JSON.parse(jsonStr));
-  } catch (e: unknown) {
-    res.status(500).json({ error: e instanceof Error ? e.message : "Failed" });
+  } catch {({ error: e instanceof Error ? e.message : "Failed" });
   }
 });
 
@@ -184,8 +177,7 @@ app.post("/api/ask-pico", async (req, res) => {
     const response = await picoAgent.generate(formattedMessages);
     const reply = stripThought(response.text || "Oops, I got confused!");
     return res.json({ content: reply });
-  } catch (e: unknown) {
-    res.status(500).json({ content: "I had trouble connecting. Try again!" });
+  } catch {({ content: "I had trouble connecting. Try again!" });
   }
 });
 
@@ -208,8 +200,7 @@ app.get("/api/discover", async (req, res) => {
       link: item.link,
     })) || [];
     return res.json({ news });
-  } catch (e: unknown) {
-    res.status(500).json({ error: "Failed to fetch discoveries" });
+  } catch {({ error: "Failed to fetch discoveries" });
   }
 });
 
@@ -239,8 +230,7 @@ app.post("/api/tts", async (req, res) => {
     const buffer = await ttsRes.arrayBuffer();
     res.set("Content-Type", "audio/mpeg");
     res.send(Buffer.from(buffer));
-  } catch (e: unknown) {
-    res.status(500).json({ error: "Failed to generate audio" });
+  } catch {({ error: "Failed to generate audio" });
   }
 });
 

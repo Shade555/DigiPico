@@ -191,7 +191,7 @@ export default function ProfilePage() {
             if (confirm("Are you sure you want to delete your account? All progress will be lost forever.")) {
               const userId = localStorage.getItem("digipico_user_id");
               if (userId) {
-                await fetch(apiUrl(`/api/user?userId=${userId}`, { method: 'DELETE' });
+                await fetch(apiUrl(`/api/user?userId=${userId}`), { method: 'DELETE' });
               }
               localStorage.clear();
               router.push("/auth");
