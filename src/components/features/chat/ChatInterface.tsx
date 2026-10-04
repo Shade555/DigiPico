@@ -6,6 +6,42 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Loader2, History, Trash2, ArrowLeft } from "lucide-react";
 import { textToSpeech } from "@/lib/audio";
 
+const CUTE_LOADING_MESSAGES = [
+  "Pico is putting on their thinking cap...",
+  "Reading a few digital books...",
+  "Translating computer-speak into human...",
+  "Pico is finding the perfect examples...",
+  "Writing down some notes...",
+  "Brewing some digital coffee...",
+  "Almost ready! Hang tight..."
+];
+
+function LoadingIndicator() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % CUTE_LOADING_MESSAGES.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="bg-[#131b3b] rounded-2xl rounded-bl-sm px-5 py-3 border border-[#1e2753] flex items-center gap-3 shadow-md overflow-hidden relative">
+      <Loader2 className="w-4 h-4 animate-spin text-blue-400 flex-shrink-0" />
+      <motion.span 
+        key={index}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -5 }}
+        className="text-xs text-slate-300 font-medium"
+      >
+        {CUTE_LOADING_MESSAGES[index]}
+      </motion.span>
+    </div>
+  );
+}
+
 export function ChatInterface() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [input, setInput] = useState("");
@@ -250,10 +286,7 @@ export function ChatInterface() {
               animate={{ opacity: 1 }} 
               className="flex justify-start"
             >
-              <div className="bg-[#131b3b] rounded-2xl rounded-bl-sm px-5 py-3 border border-[#1e2753] flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
-                <span className="text-xs text-slate-400">Pico is thinking...</span>
-              </div>
+              <LoadingIndicator />
             </motion.div>
           )}
         </AnimatePresence>

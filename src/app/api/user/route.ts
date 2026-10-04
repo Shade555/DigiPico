@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     const client = await clientPromise;
     const db = client.db('digipico');
     
-    let dbUpdates: Record<string, unknown> = { $set: updates };
+    const dbUpdates: Record<string, unknown> = { $set: updates };
     
     // Auto-unlock achievements based on XP
     if (updates.xp) {
