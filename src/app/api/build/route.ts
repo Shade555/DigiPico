@@ -1,11 +1,24 @@
 import { NextResponse } from 'next/server';
 import { digipicoAgent } from '@/agent/digipico-agent';
+import clientPromise from '@/lib/mongodb';
 
 export async function POST(req: Request) {
   try {
     const { interest } = await req.json();
     const topic = interest || "Technology";
     
+    // Try to get from cache
+    const client = await clientPromise;
+    const db = client.db('digipico');
+    const challengesCache = db.collection('build_challenges');
+    const normalizedTopic = topic.toLowerCase().trim();
+    
+    const existing = await challengesCache.findOne({ topic: normalizedTopic });
+    if (existing) {
+      console.log(`Cache hit for build challenges: ${topic}`);
+      return NextResponse.json(existing.data);
+    }
+
     const prompt = `You are a coding instructor. Create 3 JavaScript coding challenges for a beginner about "${topic}".
 Reply ONLY with a raw JSON array (no markdown, no backticks).
 Format exactly like this:
@@ -28,6 +41,13 @@ Make the first one active:true, and the rest active:false.`;
     
     const jsonStr = reply.substring(reply.indexOf('['), reply.lastIndexOf(']') + 1);
     const challenges = JSON.parse(jsonStr);
+
+    // Save to cache
+    await challengesCache.updateOne(
+      { topic: normalizedTopic },
+      { $set: { topic: normalizedTopic, data: challenges, createdAt: new Date() } },
+      { upsert: true }
+    );
 
     return NextResponse.json(challenges);
   } catch (error: unknown) {

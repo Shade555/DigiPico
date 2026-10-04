@@ -162,11 +162,17 @@ export default function ProfilePage() {
               current.push(input.value.trim());
               localStorage.setItem("digipico_interests", JSON.stringify([...new Set(current)]));
               
-              // Trigger background async generation!
+              // Trigger background async generation for Learn and Build!
               fetch("/api/learn", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ topic: input.value.trim() })
+              }).catch(console.error);
+
+              fetch("/api/build", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ interest: input.value.trim() })
               }).catch(console.error);
 
               input.value = "";

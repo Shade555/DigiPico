@@ -44,11 +44,17 @@ export default function AuthPage() {
         const interest = (document.getElementById("interestInput") as HTMLInputElement)?.value || "Introduction to AI";
         localStorage.setItem("digipico_interest", interest);
         
-        // Trigger background async generation so it's ready when they hit the Learn tab!
+        // Trigger background async generation so it's ready when they hit the Learn/Build tabs!
         fetch("/api/learn", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ topic: interest })
+        }).catch(console.error);
+
+        fetch("/api/build", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ interest })
         }).catch(console.error);
       }
       

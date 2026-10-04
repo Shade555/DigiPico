@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CodeSandbox } from "@/components/features/sandbox/CodeSandbox";
@@ -14,6 +14,47 @@ interface Challenge {
   completed: boolean;
   active: boolean;
   template: string;
+}
+
+const CUTE_LOADING_MESSAGES = [
+  "Pico is setting up the sandbox...",
+  "Loading JavaScript compilers...",
+  "Thinking of fun coding challenges...",
+  "Preparing the workspace...",
+  "Almost ready! Hang tight..."
+];
+
+function LoadingIndicator() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % CUTE_LOADING_MESSAGES.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="bg-[#131b3b] rounded-2xl px-5 py-3 border border-[#1e2753] flex items-center gap-3 shadow-md overflow-hidden relative min-w-[250px]">
+        <Loader2 className="w-5 h-5 animate-spin text-blue-400 flex-shrink-0" />
+        <AnimatePresence mode="wait">
+          <motion.span 
+            key={index}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.2 }}
+            className="text-sm font-medium text-slate-300 whitespace-nowrap"
+          >
+            {CUTE_LOADING_MESSAGES[index]}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/icon.svg" alt="Pico" className="w-20 h-20 opacity-80 animate-bounce mt-4" />
+    </div>
+  );
 }
 
 export default function BuildPage() {
@@ -96,7 +137,7 @@ export default function BuildPage() {
   if (isLoading || challenges.length === 0) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#080b1a]">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <LoadingIndicator />
       </div>
     );
   }
