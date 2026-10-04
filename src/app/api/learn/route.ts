@@ -5,74 +5,57 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     topic = body.topic || "Technology";
-    
-    // We dynamically generate the curriculum using real Wikipedia data!
-    // This provides 100% real personalized content without needing expensive API credits.
-    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=5&explaintext=1&format=json&origin=*&titles=${encodeURIComponent(topic)}`;
-    
-    const response = await fetch(searchUrl);
+    const googleApiKey = process.env.GOOGLE_API_KEY;
+
+    if (!googleApiKey) {
+      throw new Error("Missing GOOGLE_API_KEY");
+    }
+
+    const prompt = `You are a computer science professor. Create a 5-step learning curriculum for a complete beginner learning about: "${topic}". 
+    You must reply ONLY with a raw JSON object (no markdown, no markdown blocks, no code fences).
+    The JSON must match this exact structure:
+    {
+      "topic": "${topic}",
+      "progress": 0,
+      "steps": [
+        { "id": 1, "title": "Step Name", "description": "1 sentence description.", "type": "concept", "status": "current" },
+        { "id": 2, "title": "Step Name", "description": "1 sentence description.", "type": "concept", "status": "locked" },
+        { "id": 3, "title": "Step Name", "description": "1 sentence description.", "type": "project", "status": "locked" },
+        { "id": 4, "title": "Step Name", "description": "1 sentence description.", "type": "quiz", "status": "locked" },
+        { "id": 5, "title": "Step Name", "description": "1 sentence description.", "type": "concept", "status": "locked" }
+      ]
+    }`;
+
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${googleApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gemma-4-31b-it",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 1000,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`AI API failed: ${response.statusText}`);
+    }
+
     const data = await response.json();
+    let reply = data.choices?.[0]?.message?.content || "";
     
-    const pages = data.query?.pages;
-    const pageId = Object.keys(pages || {})[0];
+    // Strip <thought> tags if they exist
+    reply = reply.replace(/<thought>[\s\S]*?<\/thought>/gi, "").trim();
     
-    let extract = "";
-    if (pageId && pageId !== "-1") {
-      extract = pages[pageId].extract;
-    } else {
-      // Fallback search if exact title fails
-      const fallbackUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(topic)}&limit=1&format=json&origin=*`;
-      const fallbackResponse = await fetch(fallbackUrl);
-      const fallbackData = await fallbackResponse.json();
-      
-      if (fallbackData[1] && fallbackData[1].length > 0) {
-        const bestMatch = fallbackData[1][0];
-        const secondAttemptUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=5&explaintext=1&format=json&origin=*&titles=${encodeURIComponent(bestMatch)}`;
-        const finalResponse = await fetch(secondAttemptUrl);
-        const finalData = await finalResponse.json();
-        const finalPageId = Object.keys(finalData.query.pages)[0];
-        extract = finalData.query.pages[finalPageId].extract;
-      }
-    }
+    // Strip markdown code blocks if the AI disobeyed
+    reply = reply.replace(/^```json/gi, "").replace(/^```/gi, "").replace(/```$/gi, "").trim();
 
-    if (!extract) {
-      throw new Error("Could not find content for this topic");
-    }
+    const curriculum = JSON.parse(reply);
 
-    // Split the Wikipedia extract into distinct logical learning steps
-    const sentences = extract.split('. ').filter(s => s.length > 10).slice(0, 5);
-    
-    if (sentences.length < 3) {
-      throw new Error("Not enough data to form a curriculum");
-    }
-
-    const steps = sentences.map((sentence, index) => {
-      let type = "concept";
-      if (index === sentences.length - 1) type = "project";
-      else if (index === sentences.length - 2) type = "quiz";
-      
-      let status = "locked";
-      if (index < 2) status = "completed";
-      else if (index === 2) status = "current";
-
-      // Create a short title from the sentence
-      const words = sentence.split(' ');
-      const title = words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
-
-      return {
-        id: index + 1,
-        title: title.replace(/[^a-zA-Z0-9\s]/g, ''),
-        description: sentence + '.',
-        type,
-        status
-      };
-    });
-
-    return NextResponse.json({ 
-      topic, 
-      progress: 40, 
-      steps 
-    });
+    return NextResponse.json(curriculum);
 
   } catch (error: unknown) {
     console.error("Learn API Error:", error);

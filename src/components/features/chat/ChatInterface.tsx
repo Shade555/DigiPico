@@ -21,12 +21,23 @@ export function ChatInterface() {
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.href = "/auth";
     } else {
+      const history = localStorage.getItem("digipico_chat_history");
+      if (history) {
+        try {
+          setMessages(JSON.parse(history));
+        } catch (e) {
+          console.error("Could not parse chat history", e);
+        }
+      }
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsCheckingAuth(false);
     }
   }, []);
 
   useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem("digipico_chat_history", JSON.stringify(messages));
+    }
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
