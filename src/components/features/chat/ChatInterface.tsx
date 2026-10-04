@@ -11,6 +11,7 @@ export function ChatInterface() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
+  const [threadId, setThreadId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,9 +32,13 @@ export function ChatInterface() {
       const res = await fetch("/api/ask-pico", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ messages: newMessages, threadId }),
       });
       const data = await res.json();
+      
+      if (data.threadId) {
+        setThreadId(data.threadId);
+      }
       
       if (data.content) {
         setMessages([...newMessages, { role: "assistant", content: data.content }]);

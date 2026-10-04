@@ -1,26 +1,47 @@
 import { NextResponse } from 'next/server';
+import { BackboardClient } from 'backboard-sdk';
 import { digipicoAgent } from '@/agent/digipico-agent';
+
+// Initialize the Backboard client for Memory and RAG
+const backboardClient = new BackboardClient({ 
+  apiKey: process.env.BACKBOARD_API_KEY || 'espr_NEEDKMyVRgVD9Ky-TnM5BpO-u8wnUSQGwXF9JWJJUOc' 
+});
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    const { messages, threadId } = await req.json();
+    const lastMessage = messages[messages.length - 1].content;
 
-    if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json({ error: 'Invalid messages array' }, { status: 400 });
-    }
+    // We use Backboard for its powerful conversational memory and open-model routing
+    console.log("Routing via Backboard Memory...");
+    const backboardResponse = await backboardClient.sendMessage({
+      content: lastMessage,
+      memory: 'Auto', // Automatically retrieves long-term memory for the user
+      threadId: threadId || undefined,
+    });
 
-    // Call the Mastra agent
-    // Since Gemma-4 isn't publicly available in standard sdks yet (as of this context), 
-    // Mastra will abstract the LLM call. 
-    const response = await digipicoAgent.generate(messages);
-
+    // In a full production flow, we would pass Backboard's enriched context 
+    // into Mastra if we needed to trigger specific complex tool executions.
+    // For this chat turn, Backboard's open-weight model handles the response.
+    
     return NextResponse.json({
-      role: 'assistant',
-      content: response.text,
-      // Include any tool calls or state updates if necessary
+      content: backboardResponse.content,
+      threadId: backboardResponse.threadId,
     });
   } catch (error) {
-    console.error('Error in Ask Pico API:', error);
-    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
+    console.error("API Route Error:", error);
+    
+    // Fallback to Mastra Agent if Backboard fails or hits a rate limit
+    console.log("Falling back to local Mastra agent...");
+    const { messages } = await req.json().catch(() => ({ messages: [] }));
+    if (messages.length > 0) {
+      const mastraRes = await digipicoAgent.generate(messages);
+      return NextResponse.json({ content: mastraRes.text });
+    }
+    
+    return NextResponse.json(
+      { error: "Failed to process request" },
+      { status: 500 }
+    );
   }
 }
