@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Play, CheckCircle2, ChevronRight, Terminal, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CodeSandbox } from "@/components/features/sandbox/CodeSandbox";
 
 interface Challenge {
   id: number;
@@ -18,8 +19,7 @@ interface Challenge {
 export default function BuildPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [codeOutputs, setCodeOutputs] = useState<Record<number, string>>({});
-
+  
   const [topics, setTopics] = useState<string[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<string>("");
 
@@ -58,20 +58,7 @@ export default function BuildPage() {
     fetchChallenges();
   }, [selectedTopic]);
 
-  const runCode = async (id: number, template: string) => {
-    setCodeOutputs(prev => ({ ...prev, [id]: "Running..." }));
-    try {
-      // Very simple sandbox execution using async function
-      const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-      const fn = new AsyncFunction(template);
-      const result = await fn();
-      setCodeOutputs(prev => ({ ...prev, [id]: String(result) }));
-    } catch (e: unknown) {
-      const errorMessage = e instanceof Error ? e.message : "Unknown error";
-      setCodeOutputs(prev => ({ ...prev, [id]: `Error: ${errorMessage}` }));
-    }
-  };
-
+  
   if (isLoading || challenges.length === 0) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#080b1a]">
@@ -134,28 +121,8 @@ export default function BuildPage() {
             <p className="text-sm text-slate-400 mb-4 leading-relaxed">{challenge.description}</p>
 
             {challenge.active && (
-              <div className="bg-[#050711] rounded-2xl p-4 overflow-hidden relative border border-[#1e2753]">
-                <div className="flex items-center gap-2 mb-3 border-b border-[#1e2753] pb-2">
-                  <Terminal className="w-4 h-4 text-slate-500" />
-                  <span className="text-xs text-slate-500 font-mono">script.js</span>
-                </div>
-                <pre className="text-xs font-mono text-green-400 leading-relaxed overflow-x-auto whitespace-pre-wrap">
-                  <code>{challenge.template}</code>
-                </pre>
-                
-                {codeOutputs[challenge.id] && (
-                  <div className="mt-3 p-3 bg-[#131b3b] rounded-xl border border-[#1e2753]">
-                    <span className="text-[10px] text-slate-500 uppercase font-bold block mb-1">Output</span>
-                    <span className="text-sm font-mono text-blue-400">{codeOutputs[challenge.id]}</span>
-                  </div>
-                )}
-                
-                <Button 
-                  onClick={() => runCode(challenge.id, challenge.template)}
-                  className="w-full mt-4 bg-blue-600 text-white hover:bg-blue-500 rounded-xl font-bold transition-transform active:scale-95"
-                >
-                  <Play className="w-4 h-4 mr-2" /> Run Code
-                </Button>
+              <div className="mt-4">
+                <CodeSandbox defaultCode={challenge.template} />
               </div>
             )}
             
