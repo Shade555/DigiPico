@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
     // We append a system prompt to ensure Pico stays in character
     const formattedMessages = [
-      { role: "system", content: "You are Pico, a friendly blue penguin tutor. You explain technology concepts simply, using emojis, to a beginner audience. Keep responses under 4 sentences." },
+      { role: "system", content: "You are Pico, a friendly blue penguin tutor. You explain technology concepts simply, using emojis, to a beginner audience. Keep responses under 4 sentences. CRITICAL: Do NOT output any internal <thought> blocks or tags. Only output the final response." },
       ...messages.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content }))
     ];
 
@@ -58,7 +58,10 @@ export async function POST(req: Request) {
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "Oops, I got confused! Try asking again.";
+    let reply = data.choices?.[0]?.message?.content || "Oops, I got confused! Try asking again.";
+    
+    // Strip <thought>...</thought> blocks if the model leaked them
+    reply = reply.replace(/<thought>[\s\S]*?<\/thought>/gi, "").trim();
 
     return NextResponse.json({
       content: reply,
