@@ -94,18 +94,21 @@ export function ChatInterface() {
             </motion.div>
           )}
 
-          {messages.map((msg, i) => (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              key={i} 
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className={`rounded-2xl px-5 py-3 max-w-[85%] text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-[#131b3b] text-slate-200 rounded-bl-sm border border-[#1e2753]'}`}>
-                {msg.content}
-              </div>
-            </motion.div>
-          ))}
+          {messages.map((msg, i) => {
+            const isLastAssistantMessage = msg.role === 'assistant' && i === messages.length - 1;
+            return (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                key={i} 
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div className={`rounded-2xl px-5 py-3 max-w-[85%] text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-[#131b3b] text-slate-200 rounded-bl-sm border border-[#1e2753]'}`}>
+                  {isLastAssistantMessage ? <TypewriterText text={msg.content} /> : msg.content}
+                </div>
+              </motion.div>
+            );
+          })}
 
           {isLoading && (
             <motion.div 
@@ -152,3 +155,19 @@ export function ChatInterface() {
     </div>
   );
 }
+
+const TypewriterText = ({ text }: { text: string }) => {
+  const [displayedText, setDisplayedText] = useState("");
+
+  useEffect(() => {
+    let i = 0;
+    const intervalId = setInterval(() => {
+      setDisplayedText(text.slice(0, i + 1));
+      i++;
+      if (i > text.length) clearInterval(intervalId);
+    }, 15);
+    return () => clearInterval(intervalId);
+  }, [text]);
+
+  return <>{displayedText}</>;
+};
