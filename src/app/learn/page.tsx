@@ -35,8 +35,10 @@ export default function LearnPage() {
       storedTopics = [legacy];
       localStorage.setItem("digipico_interests", JSON.stringify(storedTopics));
     }
-    setTopics(storedTopics);
-    setSelectedTopic(storedTopics[0]);
+    setTimeout(() => {
+      setTopics(storedTopics);
+      setSelectedTopic(storedTopics[0]);
+    }, 0);
   }, []);
 
   useEffect(() => {
