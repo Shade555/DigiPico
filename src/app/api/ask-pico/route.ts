@@ -16,9 +16,7 @@ export async function POST(req: Request) {
     ];
 
     console.log("Routing via Mastra Agent + Backboard Memory...");
-    const response = await digipicoAgent.generate(formattedMessages, { 
-      threadId
-    });
+    const response = await digipicoAgent.generate(formattedMessages);
 
     let reply = response.text || "Oops, I got confused! Try asking again.";
     
