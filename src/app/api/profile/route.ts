@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getUserProgress } from '@/db/progress';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    // In a real app, this would use a session token (e.g. NextAuth)
-    // For this hackathon, we'll hardcode a dummy user ID to demonstrate the DB link
-    const userId = "test_user_123";
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId") || "test_user_123"; // Dynamic based on auth!
+    
     const progress = await getUserProgress(userId);
     
     return NextResponse.json(progress);

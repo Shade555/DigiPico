@@ -14,7 +14,8 @@ export default function ProfilePage() {
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const res = await fetch("/api/profile");
+        const userId = localStorage.getItem("digipico_user_id") || "test_user_123";
+        const res = await fetch(`/api/profile?userId=${userId}`);
         const data = await res.json();
         setUserData(data);
       } catch (e) {
