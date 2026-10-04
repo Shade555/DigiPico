@@ -18,12 +18,12 @@ export async function POST(req: Request) {
 
     let response;
     
-    if (hfApiKey) {
-      console.log("Routing via Hugging Face Serverless Inference...");
-      response = await fetch("https://api-inference.huggingface.co/models/google/gemma-4-E4B-it/v1/chat/completions", {
+    if (googleApiKey) {
+      console.log("Routing via Google AI Studio...");
+      response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${hfApiKey}`,
+          "Authorization": `Bearer ${googleApiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -33,11 +33,11 @@ export async function POST(req: Request) {
         }),
       });
     } else {
-      console.log("Routing via Google AI Studio...");
-      response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+      console.log("Routing via Hugging Face Serverless Inference...");
+      response = await fetch("https://api-inference.huggingface.co/models/google/gemma-4-E4B-it/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${googleApiKey}`,
+          "Authorization": `Bearer ${hfApiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
