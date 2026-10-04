@@ -1,11 +1,24 @@
 import { NextResponse } from 'next/server';
 import { digipicoAgent } from '@/agent/digipico-agent';
+import clientPromise from '@/lib/mongodb';
 
 export async function POST(req: Request) {
   let topic = "Technology";
   try {
     const body = await req.json();
     topic = body.topic || "Technology";
+
+    // Try to get from cache
+    const client = await clientPromise;
+    const db = client.db('digipico');
+    const curriculums = db.collection('curriculums');
+    const normalizedTopic = topic.toLowerCase().trim();
+    
+    const existing = await curriculums.findOne({ topic: normalizedTopic });
+    if (existing) {
+      console.log(`Cache hit for curriculum: ${topic}`);
+      return NextResponse.json(existing.data);
+    }
 
     const prompt = `You are a senior computer science professor. Create an incredibly comprehensive 8-step learning curriculum for a beginner learning about: "${topic}". 
     You must reply ONLY with a raw JSON object (no markdown).
@@ -31,6 +44,8 @@ export async function POST(req: Request) {
     let curriculum;
     try {
       curriculum = JSON.parse(jsonStr);
+      // Cache it
+      await curriculums.insertOne({ topic: normalizedTopic, data: curriculum });
     } catch (parseError) {
       console.error("JSON Parse Error on reply:", reply);
       throw parseError;

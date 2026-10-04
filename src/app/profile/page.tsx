@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { PicoMascot } from "@/components/features/pico/PicoMascot";
 import { calculateLevel, getPicoStage, ACHIEVEMENTS } from "@/lib/gamification";
 import { Button } from "@/components/ui/button";
-import { BellRing, Loader2, Flame, Trophy, HelpCircle, Hammer, Globe, Rocket, Brain, Leaf, Search } from "lucide-react";
+import { BellRing, Loader2, Flame, Trophy, HelpCircle, Hammer, Globe, Rocket, Brain, Leaf, Search, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
@@ -124,7 +124,8 @@ export default function ProfilePage() {
                 className="flex items-center gap-4 bg-[#131b3b] p-3 rounded-xl border border-[#1e2753]"
               >
                 <div className="bg-[#0a0f24] p-3 rounded-lg shadow-inner">
-                  {achievement.id === "first_question" ? <HelpCircle className="w-6 h-6 text-purple-400" /> : 
+                  {achievement.id === "first_login" ? <Sparkles className="w-6 h-6 text-yellow-300" /> :
+                   achievement.id === "first_question" ? <HelpCircle className="w-6 h-6 text-purple-400" /> : 
                    achievement.id === "streak_3" ? <Flame className="w-6 h-6 text-orange-500" /> : 
                    achievement.id === "first_project" ? <Hammer className="w-6 h-6 text-slate-400" /> : 
                    <Globe className="w-6 h-6 text-blue-400" />}

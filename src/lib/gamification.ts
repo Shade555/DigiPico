@@ -42,6 +42,7 @@ export function getPicoStage(level: number) {
 }
 
 export const ACHIEVEMENTS = [
+  { id: "first_login", title: "New Arrival", description: "Created your DigiPico account.", icon: "🥚" },
   { id: "first_question", title: "Inquisitive", description: "Asked Pico your first question.", icon: "🙋" },
   { id: "streak_3", title: "On Fire", description: "Maintained a 3-day learning streak.", icon: "🔥" },
   { id: "first_project", title: "Hello World", description: "Completed your first hands-on challenge.", icon: "🛠️" },

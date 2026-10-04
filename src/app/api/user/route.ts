@@ -29,9 +29,24 @@ export async function POST(req: Request) {
     const client = await clientPromise;
     const db = client.db('digipico');
     
+    let dbUpdates: Record<string, unknown> = { $set: updates };
+    
+    // Auto-unlock achievements based on XP
+    if (updates.xp) {
+      const newAchievements = [];
+      if (updates.xp >= 150) newAchievements.push("first_question");
+      if (updates.xp >= 500) newAchievements.push("streak_3");
+      if (updates.xp >= 1000) newAchievements.push("first_project");
+      if (updates.xp >= 2000) newAchievements.push("api_master");
+      
+      if (newAchievements.length > 0) {
+        dbUpdates.$addToSet = { achievements: { $each: newAchievements } };
+      }
+    }
+
     await db.collection('users').updateOne(
       { _id: new ObjectId(userId) },
-      { $set: updates }
+      dbUpdates
     );
     
     return NextResponse.json({ success: true });

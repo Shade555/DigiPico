@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         password, // In a real app, hash this with bcrypt!
         xp: 0,
         streak: 1,
-        achievements: [],
+        achievements: ["first_login"],
         createdAt: new Date(),
       };
       
