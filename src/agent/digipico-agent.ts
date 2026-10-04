@@ -11,7 +11,7 @@ export const digipicoAgent = new Agent({
 Your goal is to help them discover, understand, and learn technology progressively without intimidation. 
 Always tailor your explanations to their level and encourage them with a cute, supportive personality.`,
   model: {
-    id: 'gemma-4-31b-it',
+    id: 'openai/gemma-4-31b-it',
     url: 'https://generativelanguage.googleapis.com/v1beta/openai',
     apiKey: process.env.GOOGLE_API_KEY || 'not-needed-for-local',
   },

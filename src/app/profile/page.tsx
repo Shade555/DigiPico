@@ -144,6 +144,33 @@ export default function ProfilePage() {
           </Button>
         </div>
       </section>
+
+      <section className="mt-8 space-y-3">
+        <Button 
+          variant="outline" 
+          className="w-full border-[#1e2753] text-slate-300 hover:bg-[#131b3b]"
+          onClick={() => {
+            localStorage.removeItem("digipico_user_id");
+            localStorage.removeItem("digipico_interest");
+            localStorage.removeItem("digipico_interests");
+            window.location.href = "/auth";
+          }}
+        >
+          Log Out
+        </Button>
+        <Button 
+          variant="destructive" 
+          className="w-full bg-red-900/50 hover:bg-red-900 text-red-200 border border-red-900"
+          onClick={() => {
+            if (confirm("Are you sure you want to delete your account? All progress will be lost.")) {
+              localStorage.clear();
+              window.location.href = "/auth";
+            }
+          }}
+        >
+          Delete Account
+        </Button>
+      </section>
     </main>
   );
 }

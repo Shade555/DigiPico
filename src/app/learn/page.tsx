@@ -176,7 +176,25 @@ export default function LearnPage() {
               )}
               
               {step.status === 'current' && (
-                <Button size="sm" className="w-full mt-4 rounded-xl bg-white text-black hover:bg-slate-200 font-bold transition-transform active:scale-95 shadow-md">
+                <Button 
+                  onClick={() => {
+                    const newSteps = [...learningPath.steps];
+                    const currentIndex = newSteps.findIndex(s => s.id === step.id);
+                    if (currentIndex !== -1) {
+                      newSteps[currentIndex].status = 'completed';
+                      if (currentIndex + 1 < newSteps.length) {
+                        newSteps[currentIndex + 1].status = 'current';
+                      }
+                      setLearningPath({
+                        ...learningPath,
+                        steps: newSteps,
+                        progress: Math.min(100, Math.round(((currentIndex + 1) / newSteps.length) * 100))
+                      });
+                    }
+                  }}
+                  size="sm" 
+                  className="w-full mt-4 rounded-xl bg-white text-black hover:bg-slate-200 font-bold transition-transform active:scale-95 shadow-md"
+                >
                   Start Lesson <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
               )}

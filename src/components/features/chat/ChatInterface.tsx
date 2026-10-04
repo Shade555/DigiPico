@@ -90,9 +90,26 @@ export function ChatInterface() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] bg-[#080b1a] rounded-t-3xl overflow-hidden relative">
-      <div className="bg-[#0a0f24] p-4 border-b border-[#1e2753] flex items-center justify-center gap-3">
-        <PicoMascot size="sm" mood={isLoading ? "thinking" : "happy"} />
-        <h2 className="font-bold text-slate-100 tracking-tight text-lg">Pico Tutor</h2>
+      <div className="bg-[#0a0f24] p-4 border-b border-[#1e2753] flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <PicoMascot size="sm" mood={isLoading ? "thinking" : "happy"} />
+          <h2 className="font-bold text-slate-100 tracking-tight text-lg">Pico Tutor</h2>
+        </div>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-slate-500 hover:text-red-400 hover:bg-red-900/20"
+          onClick={() => {
+            if (confirm("Clear this conversation?")) {
+              localStorage.removeItem("digipico_chat_history");
+              localStorage.removeItem("digipico_thread_id");
+              setMessages([]);
+              setThreadId(null);
+            }
+          }}
+        >
+          Clear
+        </Button>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">

@@ -50,10 +50,16 @@ export async function POST(req: Request) {
     // Strip <thought> tags if they exist
     reply = reply.replace(/<thought>[\s\S]*?<\/thought>/gi, "").trim();
     
-    // Strip markdown code blocks if the AI disobeyed
-    reply = reply.replace(/^```json/gi, "").replace(/^```/gi, "").replace(/```$/gi, "").trim();
-
-    const curriculum = JSON.parse(reply);
+    // Find the first { and last } to robustly extract JSON
+    const jsonStr = reply.substring(reply.indexOf('{'), reply.lastIndexOf('}') + 1);
+    
+    let curriculum;
+    try {
+      curriculum = JSON.parse(jsonStr);
+    } catch (parseError) {
+      console.error("JSON Parse Error on reply:", reply);
+      throw parseError;
+    }
 
     return NextResponse.json(curriculum);
 
