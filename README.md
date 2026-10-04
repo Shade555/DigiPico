@@ -1,4 +1,8 @@
-# DigiPico Setup Guide
+# DigiPico 🐣
+
+A friendly, AI-powered technology companion built for the Hacktoberfest 2026 "Build for a Friend" challenge.
+
+## 🚀 Quick Local Setup
 
 ### 1. Install Dependencies
 ```bash
@@ -10,19 +14,37 @@ Copy `.env.example` to `.env` and fill in your keys:
 ```bash
 cp .env.example .env
 ```
-*(Add your MongoDB Atlas URI, Mastra, ElevenLabs, SerpApi, and Gemma keys)*
+*(You will need your MongoDB Atlas URI, ElevenLabs API Key, and your local/remote Gemma 4 endpoint).*
 
-### 🎙️ ElevenLabs Voice Setup (Short)
-1. Go to [elevenlabs.io](https://elevenlabs.io) and create a free account.
-2. Click your profile icon -> **Profile + API Key**.
-3. Copy the **API Key** into your `.env` as `ELEVENLABS_API_KEY`.
-4. (Optional) Find a cute voice in the Voice Library, copy its **Voice ID**, and add `ELEVENLABS_VOICE_ID=your_voice_id` to `.env`.
-
-### 3. Run the Development Server
+### 3. Run the App
 ```bash
 npm run dev
 ```
-Open `http://localhost:3000` to see Pico!
+Open `http://localhost:3000` to chat with Pico!
 
 ---
-*(Note: Mobile builds use `npx cap sync` and `npx cap open android`)*
+
+## 🌍 Production Deployment Guide
+
+As per our architecture strategy for the Hacktoberfest partner requirements, we split the deployment into two optimized environments:
+
+### 1. DigitalOcean (Frontend App Hosting)
+We use DigitalOcean App Platform (or a basic droplet) to serve the Next.js static assets and UI.
+- **How to deploy:**
+  1. Go to the DigitalOcean dashboard -> Apps -> Create App.
+  2. Connect this GitHub repository.
+  3. Set the build command to `npm run build` and output directory to `.next`.
+  4. (For Capacitor mobile builds, you can sync the `.next` out folder and compile via Android Studio/Xcode).
+
+### 2. Render (AI Runtime / Mastra Backend)
+We use Render to host the heavy Node.js runtime that executes the Mastra Agent, connects to the GPU inference endpoints, handles the TabPFN Python service, and runs the Temporal workflows.
+- **How to deploy:**
+  1. Simply connect this repository to Render.
+  2. The provided `render.yaml` file (Infrastructure as Code) will automatically configure a Node environment, run `npm install`, and start the backend service!
+
+---
+
+### 🎙️ ElevenLabs Voice Setup
+1. Go to [elevenlabs.io](https://elevenlabs.io) and create a free account.
+2. Click your profile icon -> **Profile + API Key**.
+3. Copy the **API Key** into your `.env` as `ELEVENLABS_API_KEY`.
