@@ -1,45 +1,43 @@
 import { NextResponse } from 'next/server';
+import { digipicoAgent } from '@/agent/digipico-agent';
 
 export async function POST(req: Request) {
   try {
     const { interest } = await req.json();
+    const topic = interest || "Technology";
     
-    // We dynamically generate safe JavaScript coding challenges tailored to the user's topic
-    // without needing external AI credits, ensuring 100% uptime for the hackathon!
-    const challenges = [
-      {
-        id: 1,
-        title: `Fetch ${interest} Data`,
-        description: `Write a script to fetch basic information related to ${interest} from a public API.`,
-        difficulty: "Beginner",
-        completed: true,
-        active: false,
-        template: `// Imagine this API returns ${interest} facts\nconst res = await fetch("https://dummyjson.com/products/1");\nconst data = await res.json();\nreturn data.title;`
-      },
-      {
-        id: 2,
-        title: `Stringify ${interest}`,
-        description: `Create an object representing your favorite part of ${interest} and return it as a JSON string.`,
-        difficulty: "Beginner",
-        completed: false,
-        active: true,
-        template: `const myTopic = {\n  topic: "${interest}",\n  level: "Awesome"\n};\n\nreturn JSON.stringify(myTopic);`
-      },
-      {
-        id: 3,
-        title: `Calculate ${interest} Metrics`,
-        description: `Write a math function to calculate growth rate in the ${interest} industry.`,
-        difficulty: "Intermediate",
-        completed: false,
-        active: false,
-        template: `const start = 100;\nconst end = 250;\nconst growth = ((end - start) / start) * 100;\nreturn growth + "%";`
-      }
-    ];
+    const prompt = `You are a coding instructor. Create 3 JavaScript coding challenges for a beginner about "${topic}".
+Reply ONLY with a raw JSON array (no markdown, no backticks).
+Format exactly like this:
+[
+  {
+    "id": 1,
+    "title": "Title related to ${topic}",
+    "description": "Short description of the challenge.",
+    "difficulty": "Beginner",
+    "completed": false,
+    "active": true,
+    "template": "const x = 10;\\n// Write code here\\nreturn x;"
+  }
+]
+Make the first one active:true, and the rest active:false.`;
+
+    const response = await digipicoAgent.generate([{ role: "user", content: prompt }]);
+    let reply = response.text || "";
+    reply = reply.replace(/<thought>[\s\S]*?<\/thought>/gi, "").trim();
+    
+    const jsonStr = reply.substring(reply.indexOf('['), reply.lastIndexOf(']') + 1);
+    const challenges = JSON.parse(jsonStr);
 
     return NextResponse.json(challenges);
   } catch (error: unknown) {
     console.error("Build API Error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to fetch challenges";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    // Fallback if AI fails
+    const topic = "Technology";
+    return NextResponse.json([
+      {
+        id: 1, title: `Fetch ${topic} Data`, description: `Write a script to fetch data related to ${topic}.`, difficulty: "Beginner", completed: false, active: true, template: `// Write some JS code!\nreturn "Hello World";`
+      }
+    ]);
   }
 }
