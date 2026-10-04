@@ -11,7 +11,7 @@ export const retrieveMemoryTool = createTool({
     },
     required: ['userId', 'topic'],
   },
-  execute: async ({ context }) => {
+  execute: async ({ context }: any) => {
     // In a real implementation, this queries Backboard / Tiger Data / Mongo Atlas Vector Search
     console.log(`Retrieving memory for user ${context.userId} on topic ${context.topic}`);
     return {
@@ -34,7 +34,7 @@ export const saveMemoryTool = createTool({
     },
     required: ['userId', 'fact', 'category'],
   },
-  execute: async ({ context }) => {
+  execute: async ({ context }: any) => {
     // Saves to MongoDB
     console.log(`Saved ${context.category} for user ${context.userId}: ${context.fact}`);
     return { success: true };

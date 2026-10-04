@@ -11,7 +11,7 @@ export const createLearningPathTool = createTool({
     },
     required: ['topic', 'userLevel'],
   },
-  execute: async ({ context }) => {
+  execute: async ({ context }: any) => {
     console.log(`Generating learning path for ${context.topic} at level: ${context.userLevel}`);
     
     // In a real scenario, this would trigger an agent workflow using Gemma 4 to generate a detailed path.
@@ -37,7 +37,7 @@ export const generateQuizTool = createTool({
     },
     required: ['topic'],
   },
-  execute: async ({ context }) => {
+  execute: async ({ context }: any) => {
     return {
       quizId: 'quiz_123',
       questions: [
