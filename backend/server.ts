@@ -36,7 +36,7 @@ function stripThought(text: string) {
 }
 
 // ─── /api/auth ────────────────────────────────────────────────────────────────
-app.post("/api/auth", async (req, res) => {
+app.post("/api/auth", async (req: express.Request, res: express.Response) => {
   try {
     const { username, password, action } = req.body;
     if (!username || !password) return res.status(400).json({ error: "Username and password required" });
@@ -54,24 +54,26 @@ app.post("/api/auth", async (req, res) => {
       if (!user) return res.status(401).json({ error: "Invalid credentials" });
       return res.json({ success: true, userId: user._id });
     }
-  } catch {({ error: e instanceof Error ? e.message : "Unknown" });
+  } catch (e: unknown) {
+    res.status(500).json({ error: e instanceof Error ? e.message : "Unknown" });
   }
 });
 
 // ─── /api/user GET ────────────────────────────────────────────────────────────
-app.get("/api/user", async (req, res) => {
+app.get("/api/user", async (req: express.Request, res: express.Response) => {
   try {
     const userId = req.query.userId as string;
     if (!userId) return res.status(400).json({ error: "Missing userId" });
     const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
     if (!user) return res.status(404).json({ error: "User not found" });
     return res.json(user);
-  } catch {({ error: e instanceof Error ? e.message : "Unknown" });
+  } catch (e: unknown) {
+    res.status(500).json({ error: e instanceof Error ? e.message : "Unknown" });
   }
 });
 
 // ─── /api/user POST ───────────────────────────────────────────────────────────
-app.post("/api/user", async (req, res) => {
+app.post("/api/user", async (req: express.Request, res: express.Response) => {
   try {
     const { userId, updates } = req.body;
     if (!userId) return res.status(400).json({ error: "Missing userId" });
@@ -88,23 +90,25 @@ app.post("/api/user", async (req, res) => {
     }
     await db.collection("users").updateOne({ _id: new ObjectId(userId) }, dbUpdates);
     return res.json({ success: true });
-  } catch {({ error: e instanceof Error ? e.message : "Unknown" });
+  } catch (e: unknown) {
+    res.status(500).json({ error: e instanceof Error ? e.message : "Unknown" });
   }
 });
 
 // ─── /api/user DELETE ─────────────────────────────────────────────────────────
-app.delete("/api/user", async (req, res) => {
+app.delete("/api/user", async (req: express.Request, res: express.Response) => {
   try {
     const userId = req.query.userId as string;
     if (!userId) return res.status(400).json({ error: "Missing userId" });
     await db.collection("users").deleteOne({ _id: new ObjectId(userId) });
     return res.json({ success: true });
-  } catch {({ error: e instanceof Error ? e.message : "Unknown" });
+  } catch (e: unknown) {
+    res.status(500).json({ error: e instanceof Error ? e.message : "Unknown" });
   }
 });
 
 // ─── /api/profile ─────────────────────────────────────────────────────────────
-app.get("/api/profile", async (req, res) => {
+app.get("/api/profile", async (req: express.Request, res: express.Response) => {
   try {
     const userId = req.query.userId as string;
     if (!userId || userId.length !== 24) {
@@ -113,12 +117,13 @@ app.get("/api/profile", async (req, res) => {
     const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
     if (!user) return res.json({ xp: 0, streak: 1, achievements: ["first_login"] });
     return res.json({ xp: user.xp || 0, streak: user.streak || 1, achievements: user.achievements || [] });
-  } catch {({ error: e instanceof Error ? e.message : "Unknown" });
+  } catch (e: unknown) {
+    res.status(500).json({ error: e instanceof Error ? e.message : "Unknown" });
   }
 });
 
 // ─── /api/learn ───────────────────────────────────────────────────────────────
-app.post("/api/learn", async (req, res) => {
+app.post("/api/learn", async (req: express.Request, res: express.Response) => {
   const topic = req.body.topic || "Technology";
   try {
     const curriculums = db.collection("curriculums");
@@ -142,12 +147,13 @@ Reply ONLY with a raw JSON object (no markdown) matching this structure:
     const curriculum = JSON.parse(jsonStr);
     await curriculums.insertOne({ topic: normalizedTopic, data: curriculum });
     return res.json(curriculum);
-  } catch {({ error: e instanceof Error ? e.message : "Failed" });
+  } catch (e: unknown) {
+    res.status(500).json({ error: e instanceof Error ? e.message : "Failed" });
   }
 });
 
 // ─── /api/quiz ────────────────────────────────────────────────────────────────
-app.post("/api/quiz", async (req, res) => {
+app.post("/api/quiz", async (req: express.Request, res: express.Response) => {
   const topic = req.body.topic || "Technology";
   try {
     const prompt = `You are a friendly tutor. Create a 3-question multiple choice quiz about "${topic}" for a beginner.
@@ -162,12 +168,13 @@ Reply ONLY with a raw JSON object (no markdown):
     const reply = stripThought(response.text || "");
     const jsonStr = reply.substring(reply.indexOf("{"), reply.lastIndexOf("}") + 1);
     return res.json(JSON.parse(jsonStr));
-  } catch {({ error: e instanceof Error ? e.message : "Failed" });
+  } catch (e: unknown) {
+    res.status(500).json({ error: e instanceof Error ? e.message : "Failed" });
   }
 });
 
 // ─── /api/ask-pico ────────────────────────────────────────────────────────────
-app.post("/api/ask-pico", async (req, res) => {
+app.post("/api/ask-pico", async (req: express.Request, res: express.Response) => {
   try {
     const { messages } = req.body;
     const formattedMessages = [
@@ -177,12 +184,13 @@ app.post("/api/ask-pico", async (req, res) => {
     const response = await picoAgent.generate(formattedMessages);
     const reply = stripThought(response.text || "Oops, I got confused!");
     return res.json({ content: reply });
-  } catch {({ content: "I had trouble connecting. Try again!" });
+  } catch (_e: unknown) {
+    res.status(500).json({ content: "I had trouble connecting. Try again!" });
   }
 });
 
 // ─── /api/discover ────────────────────────────────────────────────────────────
-app.get("/api/discover", async (req, res) => {
+app.get("/api/discover", async (req: express.Request, res: express.Response) => {
   const interest = (req.query.interest as string) || "artificial intelligence";
   const apiKey = process.env.SERPAPI_API_KEY;
   if (!apiKey) {
@@ -200,12 +208,13 @@ app.get("/api/discover", async (req, res) => {
       link: item.link,
     })) || [];
     return res.json({ news });
-  } catch {({ error: "Failed to fetch discoveries" });
+  } catch (_e: unknown) {
+    res.status(500).json({ error: "Failed to fetch discoveries" });
   }
 });
 
 // ─── /api/build ───────────────────────────────────────────────────────────────
-app.post("/api/build", (req, res) => {
+app.post("/api/build", (req: express.Request, res: express.Response) => {
   const { interest } = req.body;
   res.json([
     { id: 1, title: `Fetch ${interest} Data`, description: `Write a script to fetch data related to ${interest}.`, difficulty: "Beginner", completed: false, active: true, template: `// Fetch some data!\nconsole.log("Hello from ${interest}!");` },
@@ -215,7 +224,7 @@ app.post("/api/build", (req, res) => {
 });
 
 // ─── /api/tts ─────────────────────────────────────────────────────────────────
-app.post("/api/tts", async (req, res) => {
+app.post("/api/tts", async (req: express.Request, res: express.Response) => {
   try {
     const { text } = req.body;
     const apiKey = process.env.ELEVENLABS_API_KEY;
@@ -230,12 +239,13 @@ app.post("/api/tts", async (req, res) => {
     const buffer = await ttsRes.arrayBuffer();
     res.set("Content-Type", "audio/mpeg");
     res.send(Buffer.from(buffer));
-  } catch {({ error: "Failed to generate audio" });
+  } catch (_e: unknown) {
+    res.status(500).json({ error: "Failed to generate audio" });
   }
 });
 
 // ─── Health check ─────────────────────────────────────────────────────────────
-app.get("/health", (_req, res) => res.json({ status: "ok", service: "DigiPico API" }));
+app.get("/health", (_req: express.Request, res: express.Response) => res.json({ status: "ok", service: "DigiPico API" }));
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`🚀 DigiPico API running on port ${PORT}`));
