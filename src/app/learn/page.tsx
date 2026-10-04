@@ -34,10 +34,7 @@ export default function LearnPage() {
       const legacy = localStorage.getItem("digipico_interest") || "Introduction to AI";
       storedTopics = [legacy];
       localStorage.setItem("digipico_interests", JSON.stringify(storedTopics));
-    }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTopics(storedTopics);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedTopic(storedTopics[0]);
   }, []);
 

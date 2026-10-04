@@ -32,7 +32,7 @@ export const searchHackathonsTool = createTool({
     },
     required: ['topic'],
   },
-  execute: async ({ context: _context }) => {
+  execute: async () => {
     return {
       results: [
         { name: 'DEV Weekend Challenge', description: 'Build for a friend hackathon.' }

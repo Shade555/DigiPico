@@ -29,10 +29,7 @@ export default function BuildPage() {
       const legacy = localStorage.getItem("digipico_interest") || "artificial intelligence";
       storedTopics = [legacy];
       localStorage.setItem("digipico_interests", JSON.stringify(storedTopics));
-    }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTopics(storedTopics);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedTopic(storedTopics[0]);
   }, []);
 

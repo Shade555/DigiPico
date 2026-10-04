@@ -1,54 +1,62 @@
 import { NextResponse } from 'next/server';
-import { BackboardClient } from 'backboard-sdk';
-import { digipicoAgent } from '@/agent/digipico-agent';
-
-// Initialize the Backboard client for Memory and RAG
-const backboardClient = new BackboardClient({ 
-  apiKey: process.env.BACKBOARD_API_KEY || 'espr_NEEDKMyVRgVD9Ky-TnM5BpO-u8wnUSQGwXF9JWJJUOc' 
-});
 
 export async function POST(req: Request) {
   try {
-    const { messages, threadId } = await req.json();
-    const lastMessage = messages[messages.length - 1].content;
+    const { messages } = await req.json();
+    const hfApiKey = process.env.HUGGINGFACE_API_KEY;
 
-    // We use Backboard for its powerful conversational memory and open-model routing
-    console.log("Routing via Backboard Memory using Gemma 4 31B...");
-    const backboardResponse = await backboardClient.sendMessage({
-      content: lastMessage,
-      model: 'google/gemma-4-31B', // Satisfies both the Gemma and Backboard prize requirements!
-      memory: 'Auto', // Automatically retrieves long-term memory for the user
-      threadId: threadId || undefined,
+    if (!hfApiKey) {
+      throw new Error("Missing HUGGINGFACE_API_KEY in environment variables.");
+    }
+
+    console.log("Routing via Hugging Face Serverless Inference (Gemma 3/4)...");
+    
+    // We append a system prompt to ensure Pico stays in character
+    const formattedMessages = [
+      { role: "system", content: "You are Pico, a friendly blue penguin tutor. You explain technology concepts simply, using emojis, to a beginner audience. Keep responses under 4 sentences." },
+      ...messages.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content }))
+    ];
+
+    const response = await fetch("https://api-inference.huggingface.co/models/google/gemma-3-4b-it/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${hfApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemma-3-4b-it",
+        messages: formattedMessages,
+        max_tokens: 500,
+      }),
     });
 
-    // In a full production flow, we would pass Backboard's enriched context 
-    // into Mastra if we needed to trigger specific complex tool executions.
-    // For this chat turn, Backboard's open-weight model handles the response.
-    
-    return NextResponse.json({
-      content: backboardResponse.content,
-      threadId: backboardResponse.threadId,
-    });
-  } catch (error) {
-    console.error("API Route Error:", error);
-    
-    // Fallback to Mastra Agent if Backboard fails or hits a rate limit
-    console.log("Falling back to local Mastra agent...");
-    try {
-      if (messages && messages.length > 0) {
-        const mastraRes = await digipicoAgent.generate(messages);
-        return NextResponse.json({ content: mastraRes.text });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Hugging Face API Error:", errorText);
+      if (response.status === 503) {
+        throw new Error("Pico is currently waking up from a nap! (Hugging Face model is loading into memory). Please wait 30 seconds and try again.");
       }
-    } catch (_mastraError) {
-      console.log("Local Mastra also failed (likely no local GPU running). Using safe Hackathon fallback.");
-      return NextResponse.json({ 
-        content: `I'm currently running in Hackathon Demo Mode! Since the Backboard inference credits are exhausted and there's no local GPU detected, I'm using a safe fallback. But don't worry—your profile, dynamic Wikipedia curriculum, and code evaluation sandboxes are all fully functional! Try exploring the Learn or Build tabs.` 
-      });
+      throw new Error(`Hugging Face API returned status ${response.status}`);
+    }
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || "Oops, I got confused! Try asking again.";
+
+    return NextResponse.json({
+      content: reply,
+    });
+  } catch (error: unknown) {
+    console.error("API Route Error:", error);
+    const errorMessage = error instanceof Error ? error.message : "";
+    
+    if (errorMessage.includes("waking up")) {
+      return NextResponse.json({ content: errorMessage });
     }
     
-    return NextResponse.json(
-      { error: "Failed to process request" },
-      { status: 500 }
-    );
+    // Ultimate fallback if Hugging Face API fails
+    console.log("Using safe Hackathon fallback.");
+    return NextResponse.json({ 
+      content: `I'm currently running in Hackathon Demo Mode! My connection to Hugging Face is temporarily asleep. But don't worry—your profile, dynamic Wikipedia curriculum, and code sandboxes are completely functional! Try exploring the Learn or Build tabs.` 
+    });
   }
 }
