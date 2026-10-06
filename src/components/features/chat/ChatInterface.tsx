@@ -162,17 +162,15 @@ export function ChatInterface() {
     if (messages.length > 0) {
       localStorage.setItem(("digipico_chat_history_" + (localStorage.getItem("digipico_user_id") || "guest")), JSON.stringify(messages));
     }
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   }, [messages, isLoading]);
 
   if (isCheckingAuth) return <div className="h-screen bg-[#080b1a]" />; // Prevent UI flash before redirect
 
 
   return (
-    <div className="flex flex-col h-full bg-[#080b1a] rounded-t-3xl overflow-hidden relative">
-      <div className="bg-[#0a0f24] p-4 border-b border-[#1e2753] flex items-center justify-between z-20 relative shadow-sm">
+    <div className="flex flex-col relative">
+      <div className="bg-[#0a0f24] p-4 border-b border-[#1e2753] flex items-center justify-between sticky top-0 z-30 shadow-sm">
         <div className="flex items-center gap-3">
           <PicoMascot size="sm" mood={isLoading ? "thinking" : "happy"} />
           <h2 className="font-bold text-slate-100 tracking-tight text-lg">Pico Tutor</h2>
@@ -252,7 +250,7 @@ export function ChatInterface() {
           )}
         </AnimatePresence>
 
-        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4 scroll-smooth">
+        <div ref={scrollRef} className="p-4 space-y-4 pb-28">
         <AnimatePresence>
           {messages.length === 0 && (
             <motion.div 
@@ -294,8 +292,9 @@ export function ChatInterface() {
       </div>
       </div>
 
-      <div className="p-4 bg-[#0a0f24] border-t border-[#1e2753]">
-        <div className="flex gap-2 relative">
+      <div className="fixed bottom-16 left-0 right-0 z-30 pointer-events-none">
+        <div className="mx-auto max-w-md w-full p-4 bg-[#0a0f24] border-t border-[#1e2753] pointer-events-auto shadow-[0_-10px_20px_rgba(8,11,26,0.8)]">
+          <div className="flex gap-2 relative">
           <input 
             type="text" 
             value={input}
@@ -312,6 +311,7 @@ export function ChatInterface() {
           >
             <Send className="w-5 h-5 ml-1" />
           </Button>
+        </div>
         </div>
       </div>
     </div>
