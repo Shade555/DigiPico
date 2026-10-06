@@ -80,6 +80,7 @@ export async function PUT(req: Request) {
     const client = await clientPromise;
     const db = client.db('digipico');
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateDoc: Record<string, any> = {};
     if (xpToAdd) {
       updateDoc.$inc = { xp: xpToAdd };
