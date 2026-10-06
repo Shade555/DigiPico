@@ -171,7 +171,7 @@ export function ChatInterface() {
 
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-[#080b1a] rounded-t-3xl overflow-hidden relative">
+    <div className="flex flex-col h-[calc(100dvh-4rem)] bg-[#080b1a] rounded-t-3xl overflow-hidden relative">
       <div className="bg-[#0a0f24] p-4 border-b border-[#1e2753] flex items-center justify-between z-20 relative shadow-sm">
         <div className="flex items-center gap-3">
           <PicoMascot size="sm" mood={isLoading ? "thinking" : "happy"} />
@@ -252,7 +252,7 @@ export function ChatInterface() {
           )}
         </AnimatePresence>
 
-        <div ref={scrollRef} className="h-full overflow-y-auto p-4 space-y-4 scroll-smooth">
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 scroll-smooth">
         <AnimatePresence>
           {messages.length === 0 && (
             <motion.div 
