@@ -60,8 +60,8 @@ export function ChatInterface() {
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.href = "/auth";
     } else {
-      const history = localStorage.getItem("digipico_chat_history");
-      const savedThreadId = localStorage.getItem("digipico_thread_id");
+      const history = localStorage.getItem(("digipico_chat_history_" + (localStorage.getItem("digipico_user_id") || "guest")));
+      const savedThreadId = localStorage.getItem(("digipico_thread_id_" + (localStorage.getItem("digipico_user_id") || "guest")));
       if (history) {
         try {
           setTimeout(() => setMessages(JSON.parse(history)), 0);
@@ -71,7 +71,7 @@ export function ChatInterface() {
         }
       }
       
-      const savedThreads = localStorage.getItem("digipico_chat_threads");
+      const savedThreads = localStorage.getItem(("digipico_chat_threads_" + (localStorage.getItem("digipico_user_id") || "guest")));
       if (savedThreads) {
         try {
           setTimeout(() => setAllThreads(JSON.parse(savedThreads)), 0);
@@ -107,7 +107,7 @@ export function ChatInterface() {
       
       if (data.threadId) {
         setThreadId(data.threadId);
-        localStorage.setItem("digipico_thread_id", data.threadId);
+        localStorage.setItem(("digipico_thread_id_" + (localStorage.getItem("digipico_user_id") || "guest")), data.threadId);
       }
       
       if (data.content) {
@@ -126,7 +126,7 @@ export function ChatInterface() {
             };
             if (idx >= 0) updated[idx] = tData;
             else updated.push(tData);
-            localStorage.setItem("digipico_chat_threads", JSON.stringify(updated));
+            localStorage.setItem(("digipico_chat_threads_" + (localStorage.getItem("digipico_user_id") || "guest")), JSON.stringify(updated));
             return updated;
           });
         }
@@ -160,7 +160,7 @@ export function ChatInterface() {
 
   useEffect(() => {
     if (messages.length > 0) {
-      localStorage.setItem("digipico_chat_history", JSON.stringify(messages));
+      localStorage.setItem(("digipico_chat_history_" + (localStorage.getItem("digipico_user_id") || "guest")), JSON.stringify(messages));
     }
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -171,7 +171,7 @@ export function ChatInterface() {
 
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-4rem)] bg-[#080b1a] rounded-t-3xl overflow-hidden relative">
+    <div className="flex flex-col h-full bg-[#080b1a] rounded-t-3xl overflow-hidden relative">
       <div className="bg-[#0a0f24] p-4 border-b border-[#1e2753] flex items-center justify-between z-20 relative shadow-sm">
         <div className="flex items-center gap-3">
           <PicoMascot size="sm" mood={isLoading ? "thinking" : "happy"} />
@@ -193,8 +193,8 @@ export function ChatInterface() {
             className="text-slate-500 hover:text-green-400 hover:bg-green-900/20"
             onClick={() => {
               if (confirm("Start a new conversation?")) {
-                localStorage.removeItem("digipico_chat_history");
-                localStorage.removeItem("digipico_thread_id");
+                localStorage.removeItem(("digipico_chat_history_" + (localStorage.getItem("digipico_user_id") || "guest")));
+                localStorage.removeItem(("digipico_thread_id_" + (localStorage.getItem("digipico_user_id") || "guest")));
                 setMessages([]);
                 setThreadId(null);
                 setShowThreads(false);
@@ -232,8 +232,8 @@ export function ChatInterface() {
                       onClick={() => {
                         setThreadId(t.threadId);
                         setMessages(t.messages);
-                        localStorage.setItem("digipico_thread_id", t.threadId);
-                        localStorage.setItem("digipico_chat_history", JSON.stringify(t.messages));
+                        localStorage.setItem(("digipico_thread_id_" + (localStorage.getItem("digipico_user_id") || "guest")), t.threadId);
+                        localStorage.setItem(("digipico_chat_history_" + (localStorage.getItem("digipico_user_id") || "guest")), JSON.stringify(t.messages));
                         setShowThreads(false);
                       }}
                       className={`p-3 rounded-xl border cursor-pointer transition-all ${
@@ -252,7 +252,7 @@ export function ChatInterface() {
           )}
         </AnimatePresence>
 
-        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 scroll-smooth">
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4 scroll-smooth">
         <AnimatePresence>
           {messages.length === 0 && (
             <motion.div 
