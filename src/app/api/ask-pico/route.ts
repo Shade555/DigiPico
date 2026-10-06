@@ -5,8 +5,27 @@ export async function POST(req: Request) {
   try {
     const { messages, threadId } = await req.json();
 
+    const lastUserMessage = messages[messages.length - 1]?.content.toLowerCase() || "";
+    let systemContext = "You are Pico, a friendly blue penguin tutor. You explain technology concepts simply, using emojis, to a beginner audience. Keep responses under 4 sentences. CRITICAL: Do NOT output any internal <thought> blocks or tags. Only output the final response.";
+
+    if (lastUserMessage.includes("hackathon") || lastUserMessage.includes("news") || lastUserMessage.includes("latest") || lastUserMessage.includes("search")) {
+      console.log("SerpApi trigger detected. Injecting live search context...");
+      try {
+        const apiKey = process.env.SERPAPI_API_KEY;
+        if (apiKey) {
+          const q = encodeURIComponent(lastUserMessage);
+          const serpRes = await fetch(`https://serpapi.com/search.json?q=${q}&engine=google&api_key=${apiKey}`);
+          const serpData = await serpRes.json();
+          const results = (serpData.organic_results || []).slice(0, 3).map((r: { title: string, snippet: string, link: string }) => `- ${r.title}: ${r.snippet} (${r.link})`).join('\n');
+          systemContext += `\n\nLIVE SEARCH RESULTS TO HELP YOU ANSWER:\n${results}`;
+        }
+      } catch (e) {
+        console.error("SerpApi injection failed:", e);
+      }
+    }
+
     const formattedMessages = [
-      { role: "system", content: "You are Pico, a friendly blue penguin tutor. You explain technology concepts simply, using emojis, to a beginner audience. Keep responses under 4 sentences. CRITICAL: Do NOT output any internal <thought> blocks or tags. Only output the final response." },
+      { role: "system", content: systemContext },
       ...messages
     ];
 

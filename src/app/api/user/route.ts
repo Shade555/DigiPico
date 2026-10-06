@@ -71,3 +71,32 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: e instanceof Error ? e.message : 'Unknown' }, { status: 500 });
   }
 }
+
+export async function PUT(req: Request) {
+  try {
+    const { userId, xpToAdd, achievements } = await req.json();
+    if (!userId) return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+
+    const client = await clientPromise;
+    const db = client.db('digipico');
+    
+    const updateDoc: Record<string, any> = {};
+    if (xpToAdd) {
+      updateDoc.$inc = { xp: xpToAdd };
+    }
+    if (achievements && achievements.length > 0) {
+      updateDoc.$addToSet = { achievements: { $each: achievements } };
+    }
+
+    if (Object.keys(updateDoc).length > 0) {
+      await db.collection('users').updateOne(
+        { _id: new ObjectId(userId) },
+        updateDoc
+      );
+    }
+    
+    return NextResponse.json({ success: true });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'Unknown' }, { status: 500 });
+  }
+}

@@ -64,14 +64,13 @@ export default function QuizPage() {
       // Finished
       const userId = localStorage.getItem("digipico_user_id");
       if (userId && userId.length === 24) {
-        const pRes = await fetch(`/api/profile?userId=${userId}`);
-        const pData = await pRes.json();
+        const scoreToAdd = score + (selectedOpt === quiz?.questions[currentIdx].correctIndex && !showResult ? 1 : 0);
         await fetch("/api/user", {
-          method: "POST",
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             userId,
-            updates: { xp: (pData.xp || 0) + (score * 50) } // 50 XP per correct answer
+            xpToAdd: scoreToAdd * 50
           })
         });
       }

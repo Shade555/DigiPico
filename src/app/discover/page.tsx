@@ -20,8 +20,20 @@ export default function DiscoverPage() {
   useEffect(() => {
     async function fetchDiscoveries() {
       try {
-        const userInterest = localStorage.getItem("digipico_interest") || "artificial intelligence";
-        const res = await fetch(`/api/discover?interest=${encodeURIComponent(userInterest)}`);
+        let interestsStr = "artificial intelligence";
+        try {
+          const parsed = JSON.parse(localStorage.getItem("digipico_interests") || "[]");
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Join up to 2 topics for news to keep the query relevant
+            interestsStr = parsed.slice(0, 2).join(" and ");
+          } else {
+            interestsStr = localStorage.getItem("digipico_interest") || interestsStr;
+          }
+        } catch {
+          interestsStr = localStorage.getItem("digipico_interest") || interestsStr;
+        }
+
+        const res = await fetch(`/api/discover?interest=${encodeURIComponent(interestsStr)}`);
         const data = await res.json();
         if (data.news) {
           setDiscoveries(data.news);

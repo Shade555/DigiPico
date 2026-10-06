@@ -15,6 +15,8 @@ export function MobileNav() {
     { name: "Profile", href: "/profile", icon: User },
   ];
 
+  if (pathname === '/auth') return null;
+
   return (
     <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-[#0a0f24] border-t border-[#1e2753] safe-area-bottom">
       <div className="grid h-full max-w-lg grid-cols-5 mx-auto font-medium">
